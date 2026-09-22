@@ -1,0 +1,53 @@
+[
+  {
+    "id": "apdex_slo_violation_001",
+    "question": "分析本次告警，区分直接观察与待验证原因，给出有来源和适用前提的检查建议。不要把文档示例当本次事实。",
+    "scenarioId": "apdex_slo_violation_001",
+    "expectedKind": "incident_report",
+    "requiredTools": [
+      "incident.read"
+    ],
+    "expectedSources": [
+      "gitlab__docs__alerts__ApdexSLOViolation.md"
+    ],
+    "forbiddenText": [
+      "根因已确认",
+      "已自动修复",
+      "已执行修复命令"
+    ]
+  },
+  {
+    "id": "gitaly_repository_corruption_001",
+    "question": "分析本次告警，区分直接观察与待验证原因，给出有来源和适用前提的检查建议。不要把文档示例当本次事实。",
+    "scenarioId": "gitaly_repository_corruption_001",
+    "expectedKind": "incident_report",
+    "requiredTools": [
+      "incident.read"
+    ],
+    "expectedSources": [
+      "gitlab__docs__gitaly__gitaly-repository-corruption.md"
+    ],
+    "forbiddenText": [
+      "根因已确认",
+      "已自动修复",
+      "已执行修复命令"
+    ]
+  },
+  {
+    "id": "sidekiq_error_rate_high_001",
+    "question": "分析本次告警，区分直接观察与待验证原因，给出有来源和适用前提的检查建议。不要把文档示例当本次事实。",
+    "scenarioId": "sidekiq_error_rate_high_001",
+    "expectedKind": "incident_report",
+    "requiredTools": [
+      "incident.read"
+    ],
+    "expectedSources": [
+      "gitlab__docs__sidekiq__sidekiq_error_rate_high.md"
+    ],
+    "forbiddenText": [
+      "根因已确认",
+      "已自动修复",
+      "已执行修复命令"
+    ]
+  }
+]

@@ -1,0 +1,8 @@
+{"id":"rag_cpu_001","question":"CPU 使用率过高应该怎么排查？","expectedSourceFile":"cpu_high_usage.md","expectedKeywords":["CPU","system-metrics","application-logs"],"topK":3}
+{"id":"rag_cpu_002","question":"HighCPUUsage 告警需要查询哪些日志主题？","expectedSourceFile":"cpu_high_usage.md","expectedKeywords":["HighCPUUsage","system-metrics","application-logs"],"topK":3}
+{"id":"rag_memory_001","question":"JVM 内存过高和频繁 Full GC 怎么处理？","expectedSourceFile":"memory_high_usage.md","expectedKeywords":["JVM","Full GC","OOM"],"topK":3}
+{"id":"rag_memory_002","question":"HighMemoryUsage 告警可能和哪些系统事件有关？","expectedSourceFile":"memory_high_usage.md","expectedKeywords":["HighMemoryUsage","system-events","OOM"],"topK":3}
+{"id":"rag_disk_001","question":"磁盘使用率过高时应该怎么排查和清理？","expectedSourceFile":"disk_high_usage.md","expectedKeywords":["disk","HighDiskUsage","/data"],"topK":3}
+{"id":"rag_service_001","question":"服务不可用应该先检查哪些指标和日志？","expectedSourceFile":"service_unavailable.md","expectedKeywords":["ServiceUnavailable","application-logs","system-events"],"topK":3}
+{"id":"rag_slow_001","question":"接口响应时间超过 3 秒应该查哪些日志？","expectedSourceFile":"slow_response.md","expectedKeywords":["SlowResponse","database-slow-query","application-logs"],"topK":3}
+{"id":"rag_slow_002","question":"慢响应可能和数据库慢查询有什么关系？","expectedSourceFile":"slow_response.md","expectedKeywords":["database-slow-query","SQL","response"],"topK":3}

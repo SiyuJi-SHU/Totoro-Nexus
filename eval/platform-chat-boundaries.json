@@ -1,0 +1,29 @@
+[
+  {
+    "id": "combined-greeting",
+    "question": "你好，帮我分析这段告警",
+    "expectedKind": "clarification",
+    "expectedStatus": "completed",
+    "forbiddenText": ["已确认根因", "已执行修复"]
+  },
+  {
+    "id": "alarm-definition",
+    "question": "告警是什么意思？请用 Apdex 告警说明，不分析当前现场。",
+    "expectedKind": "knowledge_answer",
+    "expectedSources": ["gitlab__docs__alerts__ApdexSLOViolation.md"],
+    "referenceAnswer": "根据文档解释Apdex告警是响应体验/响应时间满意度下降的信号，不能把示例变成本次实际故障或确认根因。"
+  },
+  {
+    "id": "negated-diagnosis-after-greeting",
+    "turns": [
+      {"question": "hello", "expectedKind": "chat_reply", "expectedStatus": "completed"},
+      {
+        "question": "不要诊断，只解释 Apdex 指标。",
+        "diagnose": true,
+        "expectedKind": "knowledge_answer",
+        "expectedSources": ["gitlab__docs__alerts__ApdexSLOViolation.md"],
+        "referenceAnswer": "应遵循文字限定，只解释Apdex衡量用户对响应时间的满意度，不请求本次故障材料，不生成当前现场诊断报告。"
+      }
+    ]
+  }
+]

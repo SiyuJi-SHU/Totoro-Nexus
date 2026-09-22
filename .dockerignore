@@ -1,0 +1,5 @@
+# Build context allowlist: only the prebuilt executable JAR reaches the runtime image.
+**
+!Dockerfile
+!target/
+!target/super-biz-agent-1.0-SNAPSHOT.jar

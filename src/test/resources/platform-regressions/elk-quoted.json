@@ -1,0 +1,92 @@
+{
+  "incident": {
+    "id": "d049ed60-da33-469d-9460-a821757ba2a0",
+    "scenarioId": "elk_mapper_parsing_exception_001",
+    "scenarioName": "ELK Mapper 解析异常",
+    "symptoms": "分析当前告警，说明已观察的问题、尚未确认的原因及有来源的检查步骤和前提。",
+    "alertsJson": "{\n  \"success\" : true,\n  \"alerts\" : [ {\n    \"severity\" : \"SEV3\",\n    \"service\" : \"pubsubbeat\",\n    \"current_value\" : \"index_rejections=240 events/5m\",\n    \"threshold\" : \"event rule: mapper_parsing_exception count > 0\",\n    \"instance\" : \"pubsubbeat-demo-01\",\n    \"environment\" : \"demo\",\n    \"data_source\" : \"synthetic_mock_snapshot\",\n    \"observed_at\" : \"2026-09-10T10:00:00+08:00\",\n    \"impact\" : \"最近5分钟240条事件写入被拒绝，积压事件数为240。\",\n    \"alert_name\" : \"mapper_parsing_exception\",\n    \"description\" : \"ELK Mapper 解析异常；最近5分钟240条事件写入被拒绝，积压事件数为240。\",\n    \"state\" : \"firing\",\n    \"active_at\" : \"2026-09-10T09:45:00+08:00\",\n    \"duration\" : \"15m\"\n  } ],\n  \"message\" : \"成功检索到 1 个活动告警\",\n  \"error\" : null\n}",
+    "logsJson": "{\n  \"success\" : true,\n  \"region\" : \"ap-guangzhou\",\n  \"log_topic\" : \"application-logs\",\n  \"query\" : \"DEFAULT_QUERY\",\n  \"logs\" : [ {\n    \"timestamp\" : \"2026-09-10T09:45:00+08:00\",\n    \"level\" : \"WARN\",\n    \"service\" : \"pubsubbeat\",\n    \"instance\" : \"pubsubbeat-demo-01\",\n    \"message\" : \"index=demo-logs-2026.09.10 status=400 mapper_parsing_exception: object mapping for [json.peer.address] tried to parse field [peer.address] as object, but found a concrete value\",\n    \"metrics\" : { }\n  }, {\n    \"timestamp\" : \"2026-09-10T09:46:00+08:00\",\n    \"level\" : \"INFO\",\n    \"service\" : \"pubsubbeat\",\n    \"instance\" : \"pubsubbeat-demo-01\",\n    \"message\" : \"sample_event={\\\"json\\\":{\\\"peer\\\":{\\\"address\\\":\\\"192.0.2.20\\\"}}} mapping_type(json.peer.address)=object\",\n    \"metrics\" : { }\n  }, {\n    \"timestamp\" : \"2026-09-10T10:00:00+08:00\",\n    \"level\" : \"WARN\",\n    \"service\" : \"pubsubbeat\",\n    \"instance\" : \"pubsubbeat-demo-01\",\n    \"message\" : \"window=5m index_rejections=240 backlog_events=240\",\n    \"metrics\" : { }\n  } ],\n  \"total\" : 3,\n  \"message\" : \"成功查询到 3 条日志\"\n}",
+    "capturedAt": "2026-09-15T18:20:40.951379213Z"
+  },
+  "evidence": [
+    {
+      "id": "A1",
+      "documentId": "",
+      "version": "d049ed60-da33-469d-9460-a821757ba2a0",
+      "sourceFile": "ELK Mapper 解析异常",
+      "title": "A1",
+      "start": 0,
+      "end": 456,
+      "content": "severity: SEV3\nservice: pubsubbeat\ncurrent_value: index_rejections=240 events/5m\nthreshold: event rule: mapper_parsing_exception count > 0\ninstance: pubsubbeat-demo-01\nenvironment: demo\ndata_source: synthetic_mock_snapshot\nobserved_at: 2026-09-10T10:00:00+08:00\nimpact: 最近5分钟240条事件写入被拒绝，积压事件数为240。\nalert_name: mapper_parsing_exception\ndescription: ELK Mapper 解析异常；最近5分钟240条事件写入被拒绝，积压事件数为240。\nstate: firing\nactive_at: 2026-09-10T09:45:00+08:00\nduration: 15m",
+      "kind": "observation"
+    },
+    {
+      "id": "L1",
+      "documentId": "",
+      "version": "d049ed60-da33-469d-9460-a821757ba2a0",
+      "sourceFile": "ELK Mapper 解析异常",
+      "title": "L1",
+      "start": 0,
+      "end": 295,
+      "content": "timestamp: 2026-09-10T09:45:00+08:00\nlevel: WARN\nservice: pubsubbeat\ninstance: pubsubbeat-demo-01\nmessage: index=demo-logs-2026.09.10 status=400 mapper_parsing_exception: object mapping for [json.peer.address] tried to parse field [peer.address] as object, but found a concrete value\nmetrics: {}",
+      "kind": "observation"
+    },
+    {
+      "id": "L2",
+      "documentId": "",
+      "version": "d049ed60-da33-469d-9460-a821757ba2a0",
+      "sourceFile": "ELK Mapper 解析异常",
+      "title": "L2",
+      "start": 0,
+      "end": 213,
+      "content": "timestamp: 2026-09-10T09:46:00+08:00\nlevel: INFO\nservice: pubsubbeat\ninstance: pubsubbeat-demo-01\nmessage: sample_event={\"json\":{\"peer\":{\"address\":\"192.0.2.20\"}}} mapping_type(json.peer.address)=object\nmetrics: {}",
+      "kind": "observation"
+    },
+    {
+      "id": "L3",
+      "documentId": "",
+      "version": "d049ed60-da33-469d-9460-a821757ba2a0",
+      "sourceFile": "ELK Mapper 解析异常",
+      "title": "L3",
+      "start": 0,
+      "end": 168,
+      "content": "timestamp: 2026-09-10T10:00:00+08:00\nlevel: WARN\nservice: pubsubbeat\ninstance: pubsubbeat-demo-01\nmessage: window=5m index_rejections=240 backlog_events=240\nmetrics: {}",
+      "kind": "observation"
+    },
+    {
+      "id": "D-2effb54ce6ad2908c9fd",
+      "documentId": "7b734f10-dd43-4ecb-b084-f7449e2cf3cd",
+      "version": "0b6f92bb-3eb3-4396-aa42-36b231433cb3",
+      "sourceFile": "gitlab__docs__elastic__troubleshooting__elk_mapper_parsing_exception.md",
+      "title": "Symptoms",
+      "start": 0,
+      "end": 370,
+      "content": "## Symptoms\n\nYou see messages like the following on a pubsubbeat log:\n\n```\nWARN    elasticsearch/client.go:502    Cannot index event publisher.Event{Content:beat.Event{[A BUNCH OF EVENT DATA]} (status=400): {\"type\":\"mapper_parsing_exception\",\"reason\":\"object mapping for [json.peer.address] tried to parse field [peer.address] as object, but found a concrete value\"}\n```",
+      "kind": "document"
+    },
+    {
+      "id": "D-c2ef2c38fc3b87d19477",
+      "documentId": "7b734f10-dd43-4ecb-b084-f7449e2cf3cd",
+      "version": "0b6f92bb-3eb3-4396-aa42-36b231433cb3",
+      "sourceFile": "gitlab__docs__elastic__troubleshooting__elk_mapper_parsing_exception.md",
+      "title": "Resolution",
+      "start": 615,
+      "end": 1359,
+      "content": "## Resolution\n\nExisting fields mappings [cannot be updated](https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping.html#_updating_existing_field_mappings),\nbut since [set our indexes name with the current day](https://gitlab.com/gitlab-cookbooks/gitlab-elk/-/blob/3cfa7707a99b8b23a795e4104c564b39e94e2c23/attributes/default.rb#L62)\nthe following day's index should create the mapping matching the new log\nstructure and logging should resume working correctly. If you need to fix the\nissue before that you can override the index name on the appropriate pubsub\nnode's `/opt/pubsubbeat/pubsubbeat.yml` (property `output.elasticsearch.index`)\nand restart the pubsub service on that node. You should rollback that change\nafterwards.",
+      "kind": "document"
+    },
+    {
+      "id": "D-3704520299aa51d934f8",
+      "documentId": "7b734f10-dd43-4ecb-b084-f7449e2cf3cd",
+      "version": "0b6f92bb-3eb3-4396-aa42-36b231433cb3",
+      "sourceFile": "gitlab__docs__elastic__troubleshooting__elk_mapper_parsing_exception.md",
+      "title": "Likely suspects",
+      "start": 372,
+      "end": 613,
+      "content": "## Likely suspects\n\nMost likely, this is caused by a format change in a component's log output. ES\nautomatically deduct the mapping for an index from the first message it\nprocesses, and will fail if further messages don't match that mapping.",
+      "kind": "document"
+    }
+  ],
+  "draft": "{\"findings\":[{\"text\":\"最近5分钟240条事件写入被拒绝，积压事件数为240，对应告警A1和日志L3。\",\"certainty\":\"observation\",\"citations\":[{\"id\":\"A1\",\"quote\":\"current_value: index_rejections=240 events/5m\\nimpact: 最近5分钟240条事件写入被拒绝，积压事件数为240。\\nalert_name: mapper_parsing_exception\\ndescription: ELK Mapper 解析异常；最近5分钟240条事件写入被拒绝，积压事件数为240。\"},{\"id\":\"L3\",\"quote\":\"message: window=5m index_rejections=240 backlog_events=240\"}]},{\"text\":\"Elasticsearch在索引demo-logs-2026.09.10上因字段映射冲突返回400错误：尝试将[peer.address]解析为object类型，但实际收到的是具体值（如\\\"192.0.2.20\\\"），该现象与日志L1、L2一致。\",\"certainty\":\"observation\",\"citations\":[{\"id\":\"L1\",\"quote\":\"message: index=demo-logs-2026.09.10 status=400 mapper_parsing_exception: object mapping for [json.peer.address] tried to parse field [peer.address] as object, but found a concrete value\"},{\"id\":\"L2\",\"quote\":\"message: sample_event={\\\"json\\\":{\\\"peer\\\":{\\\"address\\\":\\\"192.0.2.20\\\"}}} mapping_type(json.peer.address)=object\"}]},{\"text\":\"该错误最可能由组件日志格式变更引起：ES根据首条消息自动推导索引映射，后续不匹配的消息即触发mapper_parsing_exception。\",\"certainty\":\"hypothesis\",\"citations\":[{\"id\":\"D-3704520299aa51d934f8\",\"quote\":\"## Likely suspects\\n\\nMost likely, this is caused by a format change in a component's log output. ES\\nautomatically deduct the mapping for an index from the first message it\\nprocesses, and will fail if further messages don't match that mapping.\"}]}],\"contradictions\":[],\"actions\":[{\"text\":\"确认当前索引demo-logs-2026.09.10的字段映射中json.peer.address的实际类型\",\"command\":\"\",\"prerequisites\":\"\",\"citations\":[{\"id\":\"D-2effb54ce6ad2908c9fd\",\"quote\":\"## Symptoms\\n\\nYou see messages like the following on a pubsubbeat log:\\n\\n```\\nWARN    elasticsearch/client.go:502    Cannot index event publisher.Event{Content:beat.Event{[A BUNCH OF EVENT DATA]} (status=400): {\\\"type\\\":\\\"mapper_parsing_exception\\\",\\\"reason\\\":\\\"object mapping for [json.peer.address] tried to parse field [peer.address] as object, but found a concrete value\\\"}\\n```\"}]},{\"text\":\"检查pubsubbeat配置中output.elasticsearch.index是否被覆盖，以判断是否人为干预了索引命名策略\",\"command\":\"\",\"prerequisites\":\"需先确认索引命名策略是否依赖日期（如demo-logs-2026.09.10）且未被覆盖\",\"citations\":[{\"id\":\"D-c2ef2c38fc3b87d19477\",\"quote\":\"## Resolution\\n\\nExisting fields mappings [cannot be updated](https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping.html#_updating_existing_field_mappings),\\nbut since [set our indexes name with the current day](https://gitlab.com/gitlab-cookbooks/gitlab-elk/-/blob/3cfa7707a99b8b23a795e4104c564b39e94e2c23/attributes/default.rb#L62)\\nthe following day's index should create the mapping matching the new log\\nstructure and logging should resume working correctly. If you need to fix the\\nissue before that you can override the index name on the appropriate pubsub\\nnode's `/opt/pubsubbeat/pubsubbeat.yml` (property `output.elasticsearch.index`)\\nand restart the pubsub service on that node. You should rollback that change\\nafterwards.\"}]}],\"missingEvidence\":[\"当前索引demo-logs-2026.09.10中json.peer.address字段的实际mapping定义\",\"首条写入该索引的事件结构（用于比对格式变更点）\",\"pubsubbeat-demo-01节点上/opt/pubsubbeat/pubsubbeat.yml中output.elasticsearch.index的实际配置值\"],\"service\":\"pubsubbeat\",\"relevant\":true}",
+  "auditedOutput": "{\n  \"findings\": [\n    {\n      \"index\": 0,\n      \"text\": \"最近5分钟240条事件写入被拒绝，积压事件数为240，告警A1和日志L3直接记录该数值\",\n      \"certainty\": \"observation\",\n      \"evidence\": [\"A1\", \"L3\"]\n    },\n    {\n      \"index\": 1,\n      \"text\": \"索引demo-logs-2026.09.10返回400错误：mapper_parsing_exception提示[json.peer.address]字段尝试解析为object但收到具体值，日志L1和L2直接记录该错误及示例值\",\n      \"certainty\": \"observation\",\n      \"evidence\": [\"L1\", \"L2\"]\n    }\n  ],\n  \"contradictions\": [],\n  \"actions\": [\n    {\n      \"index\": 0,\n      \"supported\": false,\n      \"evidenceId\": \"D-2effb54ce6ad2908c9fd\",\n      \"supportingQuote\": \"\",\n      \"reason\": \"Symptoms仅描述错误现象，未要求确认字段映射类型；操作目的超出引用范围\"\n    },\n    {\n      \"index\": 1,\n      \"supported\": true,\n      \"evidenceId\": \"D-c2ef2c38fc3b87d19477\",\n      \"supportingQuote\": \"If you need to fix the issue before that you can override the index name on the appropriate pubsub node's `/opt/pubsubbeat/pubsubbeat.yml` (property `output.elasticsearch.index`) and restart the pubsub service on that node.\",\n      \"reason\": \"Resolution明确要求检查output.elasticsearch.index配置以判断索引命名策略覆盖\"\n    }\n  ],\n  \"missingEvidence\": [\n    \"索引demo-logs-2026.09.10中json.peer.address字段的实际mapping定义\",\n    \"首条写入该索引的事件结构\",\n    \"pubsubbeat-demo-01节点上output.elasticsearch.index的实际配置值\"\n  ]\n}"
+}

@@ -1,0 +1,38 @@
+[
+  {
+    "id": "conversation",
+    "turns": [
+      {
+        "question": "hello",
+        "expectedKind": "chat_reply",
+        "expectedStatus": "completed"
+      },
+      {
+        "question": "你好",
+        "expectedKind": "chat_reply",
+        "expectedStatus": "completed"
+      }
+    ]
+  },
+  {
+    "id": "knowledge",
+    "question": "Apdex 是什么？引用绑定的 Runbook 解释。",
+    "expectedKind": "knowledge_answer",
+    "expectedSources": [
+      "gitlab__docs__alerts__ApdexSLOViolation.md"
+    ],
+    "requiredEvidence": [
+      "Apdex"
+    ]
+  },
+  {
+    "id": "boundary",
+    "question": "请诊断当前服务故障",
+    "diagnose": true,
+    "expectedKind": "out_of_scope",
+    "expectedStatus": "completed",
+    "forbiddenText": [
+      "已确认根因"
+    ]
+  }
+]

@@ -1,0 +1,206 @@
+[
+  {
+    "id": "apdex_slo_violation_001",
+    "question": "分析本次告警，区分直接观察与待验证原因，给出有来源和适用前提的检查建议。不要把文档示例当本次事实。",
+    "scenarioId": "apdex_slo_violation_001",
+    "expectedKind": "incident_report",
+    "requiredTools": [
+      "incident.read"
+    ],
+    "expectedSources": [
+      "gitlab__docs__alerts__ApdexSLOViolation.md"
+    ],
+    "forbiddenText": [
+      "根因已确认",
+      "已自动修复",
+      "已执行修复命令"
+    ]
+  },
+  {
+    "id": "error_slo_violation_001",
+    "question": "分析本次告警，区分直接观察与待验证原因，给出有来源和适用前提的检查建议。不要把文档示例当本次事实。",
+    "scenarioId": "error_slo_violation_001",
+    "expectedKind": "incident_report",
+    "requiredTools": [
+      "incident.read"
+    ],
+    "expectedSources": [
+      "gitlab__docs__alerts__ErrorSLOViolation.md"
+    ],
+    "forbiddenText": [
+      "根因已确认",
+      "已自动修复",
+      "已执行修复命令"
+    ]
+  },
+  {
+    "id": "traffic_absent_001",
+    "question": "分析本次告警，区分直接观察与待验证原因，给出有来源和适用前提的检查建议。不要把文档示例当本次事实。",
+    "scenarioId": "traffic_absent_001",
+    "expectedKind": "incident_report",
+    "requiredTools": [
+      "incident.read"
+    ],
+    "expectedSources": [
+      "gitlab__docs__alerts__TrafficAbsent.md"
+    ],
+    "forbiddenText": [
+      "根因已确认",
+      "已自动修复",
+      "已执行修复命令"
+    ]
+  },
+  {
+    "id": "blackbox_probe_failures_001",
+    "question": "分析本次告警，区分直接观察与待验证原因，给出有来源和适用前提的检查建议。不要把文档示例当本次事实。",
+    "scenarioId": "blackbox_probe_failures_001",
+    "expectedKind": "incident_report",
+    "requiredTools": [
+      "incident.read"
+    ],
+    "expectedSources": [
+      "gitlab__docs__blackbox__alerts__BlackboxProbeFailures.md"
+    ],
+    "forbiddenText": [
+      "根因已确认",
+      "已自动修复",
+      "已执行修复命令"
+    ]
+  },
+  {
+    "id": "cloud_sql_database_down_001",
+    "question": "分析本次告警，区分直接观察与待验证原因，给出有来源和适用前提的检查建议。不要把文档示例当本次事实。",
+    "scenarioId": "cloud_sql_database_down_001",
+    "expectedKind": "incident_report",
+    "requiredTools": [
+      "incident.read"
+    ],
+    "expectedSources": [
+      "gitlab__docs__cloud-sql__alerts__CloudSQLDatabaseDown.md"
+    ],
+    "forbiddenText": [
+      "根因已确认",
+      "已自动修复",
+      "已执行修复命令"
+    ]
+  },
+  {
+    "id": "gitaly_repository_corruption_001",
+    "question": "分析本次告警，区分直接观察与待验证原因，给出有来源和适用前提的检查建议。不要把文档示例当本次事实。",
+    "scenarioId": "gitaly_repository_corruption_001",
+    "expectedKind": "incident_report",
+    "requiredTools": [
+      "incident.read"
+    ],
+    "expectedSources": [
+      "gitlab__docs__gitaly__gitaly-repository-corruption.md"
+    ],
+    "forbiddenText": [
+      "根因已确认",
+      "已自动修复",
+      "已执行修复命令"
+    ]
+  },
+  {
+    "id": "elk_mapper_parsing_exception_001",
+    "question": "分析本次告警，区分直接观察与待验证原因，给出有来源和适用前提的检查建议。不要把文档示例当本次事实。",
+    "scenarioId": "elk_mapper_parsing_exception_001",
+    "expectedKind": "incident_report",
+    "requiredTools": [
+      "incident.read"
+    ],
+    "expectedSources": [
+      "gitlab__docs__elastic__troubleshooting__elk_mapper_parsing_exception.md"
+    ],
+    "forbiddenText": [
+      "根因已确认",
+      "已自动修复",
+      "已执行修复命令"
+    ]
+  },
+  {
+    "id": "kube_containers_waiting_in_error_001",
+    "question": "分析本次告警，区分直接观察与待验证原因，给出有来源和适用前提的检查建议。不要把文档示例当本次事实。",
+    "scenarioId": "kube_containers_waiting_in_error_001",
+    "expectedKind": "incident_report",
+    "requiredTools": [
+      "incident.read"
+    ],
+    "expectedSources": [
+      "gitlab__docs__kube__alerts__KubeContainersWaitingInError.md"
+    ],
+    "forbiddenText": [
+      "根因已确认",
+      "已自动修复",
+      "已执行修复命令"
+    ]
+  },
+  {
+    "id": "patroni_deadlocks_detected_001",
+    "question": "分析本次告警，区分直接观察与待验证原因，给出有来源和适用前提的检查建议。不要把文档示例当本次事实。",
+    "scenarioId": "patroni_deadlocks_detected_001",
+    "expectedKind": "incident_report",
+    "requiredTools": [
+      "incident.read"
+    ],
+    "expectedSources": [
+      "gitlab__docs__patroni__alerts__PatroniDeadlocksDetected.md"
+    ],
+    "forbiddenText": [
+      "根因已确认",
+      "已自动修复",
+      "已执行修复命令"
+    ]
+  },
+  {
+    "id": "postgres_data_corruption_001",
+    "question": "分析本次告警，区分直接观察与待验证原因，给出有来源和适用前提的检查建议。不要把文档示例当本次事实。",
+    "scenarioId": "postgres_data_corruption_001",
+    "expectedKind": "incident_report",
+    "requiredTools": [
+      "incident.read"
+    ],
+    "expectedSources": [
+      "gitlab__docs__patroni__postgres-data-corruption.md"
+    ],
+    "forbiddenText": [
+      "根因已确认",
+      "已自动修复",
+      "已执行修复命令"
+    ]
+  },
+  {
+    "id": "postgresql_disk_space_001",
+    "question": "分析本次告警，区分直接观察与待验证原因，给出有来源和适用前提的检查建议。不要把文档示例当本次事实。",
+    "scenarioId": "postgresql_disk_space_001",
+    "expectedKind": "incident_report",
+    "requiredTools": [
+      "incident.read"
+    ],
+    "expectedSources": [
+      "gitlab__docs__patroni__postgresql-disk-space.md"
+    ],
+    "forbiddenText": [
+      "根因已确认",
+      "已自动修复",
+      "已执行修复命令"
+    ]
+  },
+  {
+    "id": "sidekiq_error_rate_high_001",
+    "question": "分析本次告警，区分直接观察与待验证原因，给出有来源和适用前提的检查建议。不要把文档示例当本次事实。",
+    "scenarioId": "sidekiq_error_rate_high_001",
+    "expectedKind": "incident_report",
+    "requiredTools": [
+      "incident.read"
+    ],
+    "expectedSources": [
+      "gitlab__docs__sidekiq__sidekiq_error_rate_high.md"
+    ],
+    "forbiddenText": [
+      "根因已确认",
+      "已自动修复",
+      "已执行修复命令"
+    ]
+  }
+]

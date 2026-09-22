@@ -1,0 +1,113 @@
+{
+  "incident": {
+    "id": "f66a3871-63da-42da-955f-f7fc2cf02d71",
+    "scenarioId": "sidekiq_error_rate_high_001",
+    "scenarioName": "Sidekiq 错误率超标",
+    "symptoms": "分析当前告警，说明已观察的问题、尚未确认的原因及有来源的检查步骤和前提。",
+    "alertsJson": "{\r\n  \"success\" : true,\r\n  \"alerts\" : [ {\r\n    \"severity\" : \"SEV2\",\r\n    \"service\" : \"sidekiq-reactive-cache\",\r\n    \"current_value\" : \"job_error_ratio=12% (60/500 jobs)\",\r\n    \"threshold\" : \"demo job_error_ratio > 1.5%\",\r\n    \"instance\" : \"sidekiq-demo-03\",\r\n    \"environment\" : \"demo\",\r\n    \"data_source\" : \"synthetic_mock_snapshot\",\r\n    \"observed_at\" : \"2026-09-10T10:00:00+08:00\",\r\n    \"impact\" : \"最近5分钟500个任务中60个失败，失败集中于ReactiveCachingWorker。\",\r\n    \"alert_name\" : \"Sidekiq's error ratio exceeding SLO\",\r\n    \"description\" : \"Sidekiq 错误率超标；最近5分钟500个任务中60个失败，失败集中于ReactiveCachingWorker。\",\r\n    \"state\" : \"firing\",\r\n    \"active_at\" : \"2026-09-10T09:49:00+08:00\",\r\n    \"duration\" : \"11m\"\r\n  } ],\r\n  \"message\" : \"成功检索到 1 个活动告警\",\r\n  \"error\" : null\r\n}",
+    "logsJson": "{\r\n  \"success\" : true,\r\n  \"region\" : \"ap-guangzhou\",\r\n  \"log_topic\" : \"application-logs\",\r\n  \"query\" : \"DEFAULT_QUERY\",\r\n  \"logs\" : [ {\r\n    \"timestamp\" : \"2026-09-10T09:49:00+08:00\",\r\n    \"level\" : \"ERROR\",\r\n    \"service\" : \"sidekiq-reactive-cache\",\r\n    \"instance\" : \"sidekiq-demo-03\",\r\n    \"message\" : \"worker=ReactiveCachingWorker jid=demo-c1 Errno::EHOSTUNREACH Failed to open TCP connection to 192.0.2.188:8089 (No route to host)\",\r\n    \"metrics\" : { }\r\n  }, {\r\n    \"timestamp\" : \"2026-09-10T09:50:00+08:00\",\r\n    \"level\" : \"WARN\",\r\n    \"service\" : \"sidekiq-reactive-cache\",\r\n    \"instance\" : \"sidekiq-demo-03\",\r\n    \"message\" : \"worker=ReactiveCachingWorker jid=demo-c1 retry_count=4 endpoint=192.0.2.188:8089\",\r\n    \"metrics\" : { }\r\n  }, {\r\n    \"timestamp\" : \"2026-09-10T10:00:00+08:00\",\r\n    \"level\" : \"INFO\",\r\n    \"service\" : \"sidekiq-reactive-cache\",\r\n    \"instance\" : \"sidekiq-demo-03\",\r\n    \"message\" : \"window=5m jobs=500 failures=60 failed_worker=ReactiveCachingWorker other_workers_failures=0\",\r\n    \"metrics\" : { }\r\n  } ],\r\n  \"total\" : 3,\r\n  \"message\" : \"成功查询到 3 条日志\"\r\n}",
+    "capturedAt": "2026-09-15T16:07:38.727374300Z"
+  },
+  "evidence": [
+    {
+      "id": "A1",
+      "documentId": "",
+      "version": "f66a3871-63da-42da-955f-f7fc2cf02d71",
+      "sourceFile": "Sidekiq 错误率超标",
+      "title": "A1",
+      "start": 0,
+      "end": 494,
+      "content": "severity: SEV2\nservice: sidekiq-reactive-cache\ncurrent_value: job_error_ratio=12% (60/500 jobs)\nthreshold: demo job_error_ratio > 1.5%\ninstance: sidekiq-demo-03\nenvironment: demo\ndata_source: synthetic_mock_snapshot\nobserved_at: 2026-09-10T10:00:00+08:00\nimpact: 最近5分钟500个任务中60个失败，失败集中于ReactiveCachingWorker。\nalert_name: Sidekiq's error ratio exceeding SLO\ndescription: Sidekiq 错误率超标；最近5分钟500个任务中60个失败，失败集中于ReactiveCachingWorker。\nstate: firing\nactive_at: 2026-09-10T09:49:00+08:00\nduration: 11m",
+      "kind": "observation"
+    },
+    {
+      "id": "L1",
+      "documentId": "",
+      "version": "f66a3871-63da-42da-955f-f7fc2cf02d71",
+      "sourceFile": "Sidekiq 错误率超标",
+      "title": "L1",
+      "start": 0,
+      "end": 258,
+      "content": "timestamp: 2026-09-10T09:49:00+08:00\nlevel: ERROR\nservice: sidekiq-reactive-cache\ninstance: sidekiq-demo-03\nmessage: worker=ReactiveCachingWorker jid=demo-c1 Errno::EHOSTUNREACH Failed to open TCP connection to 192.0.2.188:8089 (No route to host)\nmetrics: {}",
+      "kind": "observation"
+    },
+    {
+      "id": "L2",
+      "documentId": "",
+      "version": "f66a3871-63da-42da-955f-f7fc2cf02d71",
+      "sourceFile": "Sidekiq 错误率超标",
+      "title": "L2",
+      "start": 0,
+      "end": 208,
+      "content": "timestamp: 2026-09-10T09:50:00+08:00\nlevel: WARN\nservice: sidekiq-reactive-cache\ninstance: sidekiq-demo-03\nmessage: worker=ReactiveCachingWorker jid=demo-c1 retry_count=4 endpoint=192.0.2.188:8089\nmetrics: {}",
+      "kind": "observation"
+    },
+    {
+      "id": "L3",
+      "documentId": "",
+      "version": "f66a3871-63da-42da-955f-f7fc2cf02d71",
+      "sourceFile": "Sidekiq 错误率超标",
+      "title": "L3",
+      "start": 0,
+      "end": 219,
+      "content": "timestamp: 2026-09-10T10:00:00+08:00\nlevel: INFO\nservice: sidekiq-reactive-cache\ninstance: sidekiq-demo-03\nmessage: window=5m jobs=500 failures=60 failed_worker=ReactiveCachingWorker other_workers_failures=0\nmetrics: {}",
+      "kind": "observation"
+    },
+    {
+      "id": "D-cbc2cd5dbe136d06cca3",
+      "documentId": "b5bedb6d-2e0f-42ee-a482-6de1e4d7e853",
+      "version": "8f82896e-7d8d-49fb-af97-561fe9368757",
+      "sourceFile": "gitlab__docs__sidekiq__sidekiq_error_rate_high.md",
+      "title": "ReactiveCachingWorker",
+      "start": 560,
+      "end": 1646,
+      "content": "### ReactiveCachingWorker\n\n* This one likes to fire when end users might have misconfigured an integration\n  with their project.\n  * As a quick example, if they utilize the Bamboo CI Integration, they are\n    required to input a server fqdn.  Should this be incorrect, or if their\n    Bamboo server is down, the integration might fail.\n* The next best step is to check <https://sentry.gitlab.net> for errors\n  * Perform a search for `ReactiveCachingWorker` and see if there might be any\n    recent errors\n* Following the example above, we might see an error such as this:\n\n```\nErrno::EHOSTUNREACHSidekiq/ReactiveCachingWorker\nFailed to open TCP connection to 192.0.2.188:8089 (No route to host -connect(2)...\n```\n\n* In this case we can quickly discern that some integration is not successfully\n  connecting to this IP address\n  * Browse into that error\n  * In the \"additional data\", subsection \"sidekiq\", you'll find something\n    similar to this:\n\n```\n{\ncontext: Job raised exception,\njob: {\nargs: [\nBambooService,\n40888973,\n41af8888732fd99c7a69cd5dbc230174ec538f36,\ndevelopment\n],\n```",
+      "kind": "document"
+    },
+    {
+      "id": "D-916f9317bcbdb9665cab",
+      "documentId": "b5bedb6d-2e0f-42ee-a482-6de1e4d7e853",
+      "version": "8f82896e-7d8d-49fb-af97-561fe9368757",
+      "sourceFile": "gitlab__docs__sidekiq__sidekiq_error_rate_high.md",
+      "title": "Symptoms",
+      "start": 0,
+      "end": 84,
+      "content": "## Symptoms\n\n* An alert in `#alerts-general` for Sidekiq's error ratio exceeding SLO",
+      "kind": "document"
+    },
+    {
+      "id": "D-bc22165e6555352a4902",
+      "documentId": "90cfae13-aaaf-4a28-ad06-ad0403b6c540",
+      "version": "90307559-1289-4c0c-baf2-ef2b1ad08716",
+      "sourceFile": "gitlab__docs__alerts__ErrorSLOViolation.md",
+      "title": "Metrics",
+      "start": 2656,
+      "end": 3700,
+      "content": "ptable thresholds. For instance, if the service usually has an error ratio of 0.5%, a threshold might be set at 1.5% to account for normal fluctuations but still detect significant reliability issues.\n\n**Example**: In the graph below there was a spike in the error ratio for sidekiq service. Upon investigation this was been caused by `Gitlab::ExclusiveLeaseHelpers::FailedToObtainLockError` error.\n\n  ![alt text](image/image.png)\n\nThe Kibana logs also provide insight as to when the issue probably started\n\n  ![alt text](image/logs.png)\n\nA few examples of how the metrics is been calculated:\n\n- Git: [GitServiceGitlabSshdErrorSLOViolation](https://gitlab.com/gitlab-com/runbooks/-/blob/9ef55ee4963242eb6acb0bdc1e536d16792edff9/mimir-rules/gitlab-gprd/git/autogenerated-gitlab-gprd-git-service-level-alerts.yml#L420)\n\n- Patroni: [gitlab_component_errors](https://gitlab.com/gitlab-com/runbooks/-/blob/9ef55ee4963242eb6acb0bdc1e536d16792edff9/mimir-rules/gitlab-gprd/patroni-ci/autogenerated-gitlab-gprd-patroni-ci-service-level-alerts.yml#L226)",
+      "kind": "document"
+    },
+    {
+      "id": "D-1663b01d00d7374dfb75",
+      "documentId": "b5bedb6d-2e0f-42ee-a482-6de1e4d7e853",
+      "version": "8f82896e-7d8d-49fb-af97-561fe9368757",
+      "sourceFile": "gitlab__docs__sidekiq__sidekiq_error_rate_high.md",
+      "title": "原文读取",
+      "start": 0,
+      "end": 86,
+      "content": "## Symptoms\n\n* An alert in `#alerts-general` for Sidekiq's error ratio exceeding SLO\n\n",
+      "kind": "document"
+    },
+    {
+      "id": "D-0e123b1e1b55b98aaf74",
+      "documentId": "b5bedb6d-2e0f-42ee-a482-6de1e4d7e853",
+      "version": "8f82896e-7d8d-49fb-af97-561fe9368757",
+      "sourceFile": "gitlab__docs__sidekiq__sidekiq_error_rate_high.md",
+      "title": "原文读取",
+      "start": 86,
+      "end": 2678,
+      "content": "## Troubleshooting\n\n* It's important to mind which sidekiq job is having issues. This\n  [chart](https://log.gprd.gitlab.net/app/kibana#/visualize/edit/AW3J3Lc4zkPhEGn_VsuR)\n  shows the worker classes with the most errors. You might want to drill down\n  [to service class](https://log.gprd.gitlab.net/app/kibana#/visualize/edit/AW2moVRdUOguGaJ_mRPG).\n* For most of them, ideally we'd contact the #backend and ask for insight\n* Some we can potentially troubleshoot ourselves\n\n### ReactiveCachingWorker\n\n* This one likes to fire when end users might have misconfigured an integration\n  with their project.\n  * As a quick example, if they utilize the Bamboo CI Integration, they are\n    required to input a server fqdn.  Should this be incorrect, or if their\n    Bamboo server is down, the integration might fail.\n* The next best step is to check <https://sentry.gitlab.net> for errors\n  * Perform a search for `ReactiveCachingWorker` and see if there might be any\n    recent errors\n* Following the example above, we might see an error such as this:\n\n```\nErrno::EHOSTUNREACHSidekiq/ReactiveCachingWorker\nFailed to open TCP connection to 192.0.2.188:8089 (No route to host -connect(2)...\n```\n\n* In this case we can quickly discern that some integration is not successfully\n  connecting to this IP address\n  * Browse into that error\n  * In the \"additional data\", subsection \"sidekiq\", you'll find something\n    similar to this:\n\n```\n{\ncontext: Job raised exception,\njob: {\nargs: [\nBambooService,\n40888973,\n41af8888732fd99c7a69cd5dbc230174ec538f36,\ndevelopment\n],\n```\n\n* In this example we can confirm there's trouble using the Bamboo CI Integration\n  from project id `40888973`\n* In this case, we'll use our administrative power to disable this integration\n* First find the project:\n  * Log into a rails console\n  * `BambooService.find(40888973).project` will return the project\n* Now disable the integration\n  * Using your administrative rights, log into gitlab, navigate to the project\n  * Go to the integrations section\n  * Find, in this example, Bamboo CI\n  * Browse into it's configuration, Disable and save it\n* Finally, reach out to support letting them know your findings, the decision\n  into what led disabling this integration, and ask that they reach out to the\n  end user\n\n### GithubService (ProjectServiceWorker)\n\nUntil <https://gitlab.com/gitlab-org/gitlab/-/issues/30996> is fixed, client errors\nare reported as job errors from this service. If the logs are full of 4XX\nerrors, there is nothing to do. We can't stop users from submitting incorrect\nrepo paths or invalid credentials.\n",
+      "kind": "document"
+    }
+  ],
+  "auditedOutput": "{\n  \"findings\": [\n    {\n      \"text\": \"Sidekiq错误率已达12%（60/500），全部失败集中于ReactiveCachingWorker，日志明确显示其因Errno::EHOSTUNREACH持续无法连接192.0.2.188:8089。\",\n      \"certainty\": \"observation\",\n      \"citations\": [\n        {\n          \"id\": \"A1\",\n          \"quote\": \"impact: 最近5分钟500个任务中60个失败，失败集中于ReactiveCachingWorker。\\nalert_name: Sidekiq's error ratio exceeding SLO\\ndescription: Sidekiq 错误率超标；最近5分钟500个任务中60个失败，失败集中于ReactiveCachingWorker。\"\n        },\n        {\n          \"id\": \"L1\",\n          \"quote\": \"message: worker=ReactiveCachingWorker jid=demo-c1 Errno::EHOSTUNREACH Failed to open TCP connection to 192.0.2.188:8089 (No route to host)\"\n        }\n      ]\n    },\n    {\n      \"text\": \"该现象符合文档所述‘用户误配集成（如Bamboo CI）导致连接失败’的典型模式，但尚未确认具体项目、集成服务类型（如BambooService）或目标服务状态。\",\n      \"certainty\": \"hypothesis\",\n      \"citations\": [\n        {\n          \"id\": \"D-cbc2cd5dbe136d06cca3\",\n          \"quote\": \"### ReactiveCachingWorker\\n\\n* This one likes to fire when end users might have misconfigured an integration\\n  with their project.\\n  * As a quick example, if they utilize the Bamboo CI Integration, they are\\n    required to input a server fqdn.  Should this be incorrect, or if their\\n    Bamboo server is down, the integration might fail.\"\n        },\n        {\n          \"id\": \"D-0e123b1e1b55b98aaf74\",\n          \"quote\": \"### ReactiveCachingWorker\\n\\n* This one likes to fire when end users might have misconfigured an integration\\n  with their project.\\n  * As a quick example, if they utilize the Bamboo CI Integration, they are\\n    required to input a server fqdn.  Should this be incorrect, or if their\\n    Bamboo server is down, the integration might fail.\"\n        }\n      ]\n    }\n  ],\n  \"actions\": [\n    {\n      \"text\": \"检查Sentry中ReactiveCachingWorker最近错误，确认job.args中集成服务类名（如BambooService）及project_id。\",\n      \"command\": \"\",\n      \"prerequisites\": \"需具备Sentry访问权限；该操作基于文档明确指引：'Perform a search for `ReactiveCachingWorker` and see if there might be any recent errors'，且后续分析依赖job.args结构示例。\",\n      \"citations\": [\n        {\n          \"id\": \"D-cbc2cd5dbe136d06cca3\",\n          \"quote\": \"* The next best step is to check <https://sentry.gitlab.net> for errors\\n  * Perform a search for `ReactiveCachingWorker` and see if there might be any\\n    recent errors\"\n        },\n        {\n          \"id\": \"D-0e123b1e1b55b98aaf74\",\n          \"quote\": \"* The next best step is to check <https://sentry.gitlab.net> for errors\\n  * Perform a search for `ReactiveCachingWorker` and see if there might be any\\n    recent errors\"\n        }\n      ]\n    },\n    {\n      \"text\": \"登录Rails console执行BambooService.find(<id>).project定位项目（若Sentry中job.args确认为BambooService）。\",\n      \"command\": \"BambooService.find(40888973).project\",\n      \"prerequisites\": \"仅当Sentry错误中job.args确认为['BambooService', <project_id>, ...]时适用；需具备GitLab Rails console管理员访问权限；风险：直接调用模型方法可能触发副作用（如缓存刷新），但文档未提示阻断性风险。\",\n      \"citations\": [\n        {\n          \"id\": \"D-0e123b1e1b55b98aaf74\",\n          \"quote\": \"* In this example we can confirm there's trouble using the Bamboo CI Integration\\n  from project id `40888973`\\n* First find the project:\\n  * Log into a rails console\\n  * `BambooService.find(40888973).project` will return the project\"\n        }\n      ]\n    },\n    {\n      \"text\": \"访问该项目集成页，核查并禁用对应Bamboo CI配置（若确认为BambooService且项目可定位）。\",\n      \"command\": \"\",\n      \"prerequisites\": \"需具备对应项目管理员权限；仅在确认BambooService及project_id后执行；风险：禁用集成将中断该CI功能，需同步通知支持团队联系用户。\",\n      \"citations\": [\n        {\n          \"id\": \"D-0e123b1e1b55b98aaf74\",\n          \"quote\": \"* Now disable the integration\\n  * Using your administrative rights, log into gitlab, navigate to the project\\n  * Go to the integrations section\\n  * Find, in this example, Bamboo CI\\n  * Browse into it's configuration, Disable and save it\"\n        }\n      ]\n    }\n  ],\n  \"missingEvidence\": [\n    \"Sentry错误详情（含完整job.args）\",\n    \"目标IP 192.0.2.188:8089当前可达性（如ping或telnet测试结果）\",\n    \"该IP对应的具体集成服务类型与状态（如是否确为Bamboo服务器、是否宕机）\"\n  ]\n}"
+}

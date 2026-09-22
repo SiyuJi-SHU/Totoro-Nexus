@@ -1,0 +1,351 @@
+[
+  {
+    "scenario_id": "apdex_slo_violation_001",
+    "display_name": "Apdex SLO 违反（用户体验下降）",
+    "alert": {
+      "alert_name": "ApdexSLOViolation",
+      "description": "Apdex 评分低于预设阈值，表明服务响应时间出现性能下降，用户体验受到影响。",
+      "severity": "severity::2",
+      "service": "",
+      "duration": "",
+      "current_value": "",
+      "threshold": "0.8"
+    },
+    "related_logs": [],
+    "expected_docs": [
+      "opensource/gitlab__docs__alerts__ApdexSLOViolation.md"
+    ],
+    "expected_root_cause": "数据库连接问题、慢查询或数据库性能问题",
+    "expected_actions": [
+      "检查 Apdex 评分详情、响应时间、错误率和异常情况",
+      "检查日志中与受影响服务相关的错误、超时或慢查询",
+      "检查近期部署、配置变更或基础设施修改"
+    ]
+  },
+  {
+    "scenario_id": "error_slo_violation_001",
+    "display_name": "错误率 SLO 违反（应用错误率超标）",
+    "alert": {
+      "alert_name": "ErrorSLOViolation",
+      "description": "应用或服务的错误率超过了 SLO 阈值，表明存在影响功能或用户体验的潜在问题。",
+      "severity": "severity::2",
+      "service": "sidekiq service",
+      "duration": "",
+      "current_value": "",
+      "threshold": "1.5%"
+    },
+    "related_logs": [
+      {
+        "timestamp": "",
+        "level": "",
+        "service": "sidekiq service",
+        "message": "Gitlab::ExclusiveLeaseHelpers::FailedToObtainLockError"
+      }
+    ],
+    "expected_docs": [
+      "opensource/gitlab__docs__alerts__ErrorSLOViolation.md"
+    ],
+    "expected_root_cause": "应用代码缺陷导致异常行为",
+    "expected_actions": [
+      "调查应用错误日志以识别具体错误",
+      "分析错误时间戳和频率以定位潜在根因",
+      "将错误消息与近期代码部署或基础设施变更关联"
+    ]
+  },
+  {
+    "scenario_id": "traffic_absent_001",
+    "display_name": "流量缺失（服务无请求）",
+    "alert": {
+      "alert_name": "TrafficAbsent",
+      "description": "服务未收到预期流量，表明服务可能未正常运行，可能导致依赖系统和用户功能中断。",
+      "severity": "severity::2",
+      "service": "Sidekiq",
+      "duration": "30m",
+      "current_value": "zero",
+      "threshold": "5 jobs per minute"
+    },
+    "related_logs": [],
+    "expected_docs": [
+      "opensource/gitlab__docs__alerts__TrafficAbsent.md"
+    ],
+    "expected_root_cause": "服务可能宕机或无响应",
+    "expected_actions": [
+      "使用仪表板链接检查服务及其依赖项的状态",
+      "在 Kibana 中查找错误或异常活动",
+      "检查服务的 RPS 趋势，判断是流量峰值问题还是完全无流量"
+    ]
+  },
+  {
+    "scenario_id": "blackbox_probe_failures_001",
+    "display_name": "黑盒探针失败（外部探测异常）",
+    "alert": {
+      "alert_name": "BlackboxProbeFailures",
+      "description": "黑盒导出器执行的探针成功率在 10 分钟内低于 75%，表明服务可达性或健康检查失败。",
+      "severity": "Sev4 to Sev1",
+      "service": "Blackbox Exporter Service",
+      "duration": "10m",
+      "current_value": "",
+      "threshold": "75%"
+    },
+    "related_logs": [],
+    "expected_docs": [
+      "opensource/gitlab__docs__blackbox__alerts__BlackboxProbeFailures.md"
+    ],
+    "expected_root_cause": "多种因素可能导致探针失败：GCP 故障、Cloudflare 事件、SSL 证书过期或破坏性变更",
+    "expected_actions": [
+      "检查端点是否可达；如果不可达，检查日志并找出原因",
+      "SSH 端口转发命令：ssh blackbox-01-inf-gprd.c.gitlab-production.internal -L 9115:localhost:9115",
+      "注意导出器最多保留 1000 个结果，旧结果会被丢弃"
+    ]
+  },
+  {
+    "scenario_id": "cloud_sql_database_down_001",
+    "display_name": "Cloud SQL 数据库宕机",
+    "alert": {
+      "alert_name": "CloudSQLDatabaseDown",
+      "description": "Cloud SQL 数据库不可用，使用该数据库的所有服务可能降级或不可用。",
+      "severity": "",
+      "service": "Cloud SQL Service",
+      "duration": "5m",
+      "current_value": "0",
+      "threshold": "1"
+    },
+    "related_logs": [],
+    "expected_docs": [
+      "opensource/gitlab__docs__cloud-sql__alerts__CloudSQLDatabaseDown.md"
+    ],
+    "expected_root_cause": "更可能是由于配置变更或团队维护工作导致",
+    "expected_actions": [
+      "从告警表达式中识别哪个数据库不可用",
+      "检查服务是否工作正常或显示问题，排除误报",
+      "登录 Google Cloud 控制台，找到 Cloud SQL 数据库并查看健康信息"
+    ]
+  },
+  {
+    "scenario_id": "gitaly_repository_corruption_001",
+    "display_name": "Gitaly 仓库损坏（非正常关闭后）",
+    "alert": {
+      "alert_name": "Restoring gitaly data corruption on a project after an unclean shutdown",
+      "description": "访问项目主页时返回 5xx 错误，可能是仓库数据损坏的受害者。",
+      "severity": "",
+      "service": "gitaly",
+      "duration": "",
+      "current_value": "",
+      "threshold": ""
+    },
+    "related_logs": [
+      {
+        "timestamp": "",
+        "level": "error",
+        "service": "git",
+        "message": "error: refs/keep-around/0123456789abcdef0123456789abcdef01234567: invalid sha1 pointer 0000000000000000000000000000000000000000"
+      },
+      {
+        "timestamp": "",
+        "level": "error",
+        "service": "git",
+        "message": "error: refs/heads/master: invalid sha1 pointer 0000000000000000000000000000000000000000"
+      }
+    ],
+    "expected_docs": [
+      "opensource/gitlab__docs__gitaly__gitaly-repository-corruption.md"
+    ],
+    "expected_root_cause": "Gitaly 在主机失败前未将 ref 内容同步到磁盘，导致文件在过程中损坏",
+    "expected_actions": [
+      "先做备份！",
+      "运行 git fsck 获取损坏概况",
+      "使用 sudo -u git git update-ref 修复损坏的引用"
+    ]
+  },
+  {
+    "scenario_id": "elk_mapper_parsing_exception_001",
+    "display_name": "ELK Mapper 解析异常",
+    "alert": {
+      "alert_name": "mapper_parsing_exception",
+      "description": "pubsubbeat 日志中出现类似以下的消息：字段映射异常。",
+      "severity": "",
+      "service": "pubsubbeat",
+      "duration": "",
+      "current_value": "",
+      "threshold": ""
+    },
+    "related_logs": [
+      {
+        "timestamp": "",
+        "level": "WARN",
+        "service": "pubsubbeat",
+        "message": "WARN    elasticsearch/client.go:502    Cannot index event publisher.Event{Content:beat.Event{[A BUNCH OF EVENT DATA]} (status=400): {\"type\":\"mapper_parsing_exception\",\"reason\":\"object mapping for [json.peer.address] tried to parse field [peer.address] as object, but found a concrete value\"}"
+      }
+    ],
+    "expected_docs": [
+      "opensource/gitlab__docs__elastic__troubleshooting__elk_mapper_parsing_exception.md"
+    ],
+    "expected_root_cause": "很可能是由于组件日志输出格式发生变化",
+    "expected_actions": [
+      "第二天的索引应会创建匹配新日志结构的映射，日志记录将恢复正常",
+      "在相应 pubsub 节点的 /opt/pubsubbeat/pubsubbeat.yml 中覆盖索引名称",
+      "之后应回滚该变更"
+    ]
+  },
+  {
+    "scenario_id": "kube_containers_waiting_in_error_001",
+    "display_name": "Kubernetes 容器等待启动错误",
+    "alert": {
+      "alert_name": "KubeContainersWaitingInError",
+      "description": "超过 50% 等待启动的容器处于错误状态（ContainerCreating 以外的任何原因）。现有运行容器不受影响，但可能在替换容器无法启动时被终止。",
+      "severity": "",
+      "service": "Kubernetes Service Overview",
+      "duration": "",
+      "current_value": "",
+      "threshold": "50%"
+    },
+    "related_logs": [],
+    "expected_docs": [
+      "opensource/gitlab__docs__kube__alerts__KubeContainersWaitingInError.md"
+    ],
+    "expected_root_cause": "应用的配置错误被部署，导致启动时 CrashLoopBackOff",
+    "expected_actions": [
+      "glsh kube use-cluster <env>",
+      "kubectl get pods -A --field-selector=status.phase=Pending",
+      "kubectl logs -n <namespace> <pod> [--previous]"
+    ]
+  },
+  {
+    "scenario_id": "patroni_deadlocks_detected_001",
+    "display_name": "Patroni 检测到死锁",
+    "alert": {
+      "alert_name": "PatroniDeadlocksDetected",
+      "description": "PostgreSQL 报告持续的、升高的死锁数量，可能发生在主节点或副本上。",
+      "severity": "severity::4",
+      "service": "Patroni Service",
+      "duration": "10m",
+      "current_value": "",
+      "threshold": "5 deadlocks / 5 min"
+    },
+    "related_logs": [
+      {
+        "timestamp": "",
+        "level": "ERROR",
+        "service": "PostgreSQL",
+        "message": "ERROR:  deadlock detected\nDETAIL: Process 123 waits for ShareLock on transaction 456; blocked by process 789.\n        Process 789 waits for ShareLock on transaction 654; blocked by process 123.\n        Process 123: UPDATE ...\n        Process 789: UPDATE ...\nCONTEXT: while updating tuple (x,y) in relation \"some_table\""
+      }
+    ],
+    "expected_docs": [
+      "opensource/gitlab__docs__patroni__alerts__PatroniDeadlocksDetected.md"
+    ],
+    "expected_root_cause": "两个代码路径以相反顺序获取行锁，或长时间/事务空闲中的会话持有锁",
+    "expected_actions": [
+      "纠正两个代码路径之间不一致的锁顺序，使它们以相同顺序获取锁",
+      "缩短或拆分持有锁时间过长的大型事务（通常是 Sidekiq 作业）",
+      "消除持有锁的事务空闲会话"
+    ]
+  },
+  {
+    "scenario_id": "postgres_data_corruption_001",
+    "display_name": "PostgreSQL 数据损坏",
+    "alert": {
+      "alert_name": "Dealing with Data Corruption in PostgreSQL",
+      "description": "PostgreSQL 中的数据损坏是非常罕见但可能发生的场景。",
+      "severity": "",
+      "service": "PostgreSQL",
+      "duration": "",
+      "current_value": "",
+      "threshold": ""
+    },
+    "related_logs": [
+      {
+        "timestamp": "",
+        "level": "",
+        "service": "PostgreSQL",
+        "message": "could not read block ZZZZ in file \"base/16401/33909\": read only 0 of NNNN bytes"
+      },
+      {
+        "timestamp": "",
+        "level": "WARNING",
+        "service": "PostgreSQL",
+        "message": "WARNING: page verification failed, calculated checksum 726 but expected 827"
+      },
+      {
+        "timestamp": "",
+        "level": "ERROR",
+        "service": "PostgreSQL",
+        "message": "ERROR: invalid page in block 0 of relation base/16401/33909"
+      }
+    ],
+    "expected_docs": [
+      "opensource/gitlab__docs__patroni__postgres-data-corruption.md"
+    ],
+    "expected_root_cause": "磁盘故障",
+    "expected_actions": [
+      "REINDEX CONCURRENTLY",
+      "重新创建索引",
+      "联系 DBRE 和 OnGres 寻求支持"
+    ]
+  },
+  {
+    "scenario_id": "postgresql_disk_space_001",
+    "display_name": "PostgreSQL 磁盘空间不足",
+    "alert": {
+      "alert_name": "PostgreSQL",
+      "description": "Postgres 服务器磁盘空间已耗尽。",
+      "severity": "",
+      "service": "Postgres",
+      "duration": "",
+      "current_value": "",
+      "threshold": ""
+    },
+    "related_logs": [
+      {
+        "timestamp": "2018-01-29 10:13:01 GMT",
+        "level": "LOG",
+        "service": "postgresql",
+        "message": "2018-01-29_10:13:01.21015 postgres02 postgresql: 2018-01-29 10:13:01 GMT [91066]: [1-1] LOG:  started streaming WAL from primary at 2B44/23000000 on timeline 4"
+      },
+      {
+        "timestamp": "2018-01-29 10:13:01 GMT",
+        "level": "FATAL",
+        "service": "postgresql",
+        "message": "2018-01-29_10:13:01.21047 postgres02 postgresql: 2018-01-29 10:13:01 GMT [91066]: [2-1] FATAL:  could not receive data from WAL stream: ERROR:  requested WAL segment 0000000400002B4400000023 has already been removed"
+      }
+    ],
+    "expected_docs": [
+      "opensource/gitlab__docs__patroni__postgresql-disk-space.md"
+    ],
+    "expected_root_cause": "如果存在 active 为 false 且 restart_lsn 明显过时的复制槽，可能会强制 Postgres 保留大量旧的 xlog",
+    "expected_actions": [
+      "tail /var/log/gitlab/postgresql/current",
+      "select * from pg_replication_slots",
+      "du -sh /var/opt/gitlab/postgresql/data/pg_xlog"
+    ]
+  },
+  {
+    "scenario_id": "sidekiq_error_rate_high_001",
+    "display_name": "Sidekiq 错误率超标",
+    "alert": {
+      "alert_name": "Sidekiq's error ratio exceeding SLO",
+      "description": "#alerts-general 中出现 Sidekiq 错误率超过 SLO 的告警。",
+      "severity": "",
+      "service": "Sidekiq",
+      "duration": "",
+      "current_value": "",
+      "threshold": "SLO"
+    },
+    "related_logs": [
+      {
+        "timestamp": "",
+        "level": "",
+        "service": "ReactiveCachingWorker",
+        "message": "Errno::EHOSTUNREACHSidekiq/ReactiveCachingWorker\nFailed to open TCP connection to 192.0.2.188:8089 (No route to host -connect(2)..."
+      }
+    ],
+    "expected_docs": [
+      "opensource/gitlab__docs__sidekiq__sidekiq_error_rate_high.md"
+    ],
+    "expected_root_cause": "如果配置不正确，或 Bamboo 服务器宕机，集成可能会失败",
+    "expected_actions": [
+      "搜索 ReactiveCachingWorker 查看是否有近期错误",
+      "使用管理权限禁用此集成",
+      "联系支持团队告知发现、导致禁用集成的决策，并请求联系最终用户"
+    ]
+  }
+]

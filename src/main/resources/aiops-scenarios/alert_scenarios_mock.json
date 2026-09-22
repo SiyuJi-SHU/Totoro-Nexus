@@ -1,0 +1,506 @@
+[
+  {
+    "scenario_id": "apdex_slo_violation_001",
+    "display_name": "Apdex SLO 违反（用户体验下降）",
+    "alert": {
+      "alert_name": "ApdexSLOViolation",
+      "description": "Apdex SLO 违反（用户体验下降）；最近5分钟1000个请求中慢请求310个，HTTP 5xx为12个。",
+      "severity": "SEV2",
+      "service": "gitlab-web",
+      "instance": "web-demo-01",
+      "environment": "demo",
+      "data_source": "synthetic_mock_snapshot",
+      "active_at": "2026-09-10T09:35:00+08:00",
+      "observed_at": "2026-09-10T10:00:00+08:00",
+      "duration": "25m",
+      "current_value": "Apdex=0.62",
+      "threshold": "Apdex < 0.8",
+      "impact": "最近5分钟1000个请求中慢请求310个，HTTP 5xx为12个。"
+    },
+    "related_logs": [
+      {
+        "timestamp": "2026-09-10T09:35:00+08:00",
+        "level": "WARN",
+        "service": "gitlab-web",
+        "instance": "web-demo-01",
+        "message": "request_id=demo-a1 path=/projects duration_ms=4200 db_duration_ms=3600 status=200"
+      },
+      {
+        "timestamp": "2026-09-10T09:36:00+08:00",
+        "level": "WARN",
+        "service": "gitlab-web",
+        "instance": "web-demo-01",
+        "message": "request_id=demo-a2 path=/projects duration_ms=5100 db_duration_ms=4400 status=200"
+      },
+      {
+        "timestamp": "2026-09-10T10:00:00+08:00",
+        "level": "INFO",
+        "service": "gitlab-web",
+        "instance": "web-demo-01",
+        "message": "window=5m requests=1000 slow_requests=310 http_5xx=12 apdex=0.62"
+      }
+    ]
+  },
+  {
+    "scenario_id": "error_slo_violation_001",
+    "display_name": "错误率 SLO 违反（应用错误率超标）",
+    "alert": {
+      "alert_name": "ErrorSLOViolation",
+      "description": "错误率 SLO 违反（应用错误率超标）；最近5分钟1000个任务中82个失败，队列仍在消费。",
+      "severity": "SEV2",
+      "service": "sidekiq-main",
+      "instance": "sidekiq-demo-01",
+      "environment": "demo",
+      "data_source": "synthetic_mock_snapshot",
+      "active_at": "2026-09-10T09:42:00+08:00",
+      "observed_at": "2026-09-10T10:00:00+08:00",
+      "duration": "18m",
+      "current_value": "job_error_ratio=8.2%",
+      "threshold": "job_error_ratio > 1.5%",
+      "impact": "最近5分钟1000个任务中82个失败，队列仍在消费。"
+    },
+    "related_logs": [
+      {
+        "timestamp": "2026-09-10T09:42:00+08:00",
+        "level": "ERROR",
+        "service": "sidekiq-main",
+        "instance": "sidekiq-demo-01",
+        "message": "worker=ProjectImportWorker jid=demo-b1 Gitlab::ExclusiveLeaseHelpers::FailedToObtainLockError resource=project:42"
+      },
+      {
+        "timestamp": "2026-09-10T09:43:00+08:00",
+        "level": "WARN",
+        "service": "sidekiq-main",
+        "instance": "sidekiq-demo-01",
+        "message": "worker=ProjectImportWorker jid=demo-b2 retry_count=3 resource=project:42"
+      },
+      {
+        "timestamp": "2026-09-10T10:00:00+08:00",
+        "level": "INFO",
+        "service": "sidekiq-main",
+        "instance": "sidekiq-demo-01",
+        "message": "window=5m jobs=1000 failed_jobs=82 completed_jobs=918"
+      }
+    ]
+  },
+  {
+    "scenario_id": "traffic_absent_001",
+    "display_name": "流量缺失（服务无请求）",
+    "alert": {
+      "alert_name": "TrafficAbsent",
+      "description": "流量缺失（服务无请求）；队列待处理任务由120增长到780，30分钟内无完成任务。",
+      "severity": "SEV2",
+      "service": "sidekiq-scheduler",
+      "instance": "sidekiq-demo-02",
+      "environment": "demo",
+      "data_source": "synthetic_mock_snapshot",
+      "active_at": "2026-09-10T09:30:00+08:00",
+      "observed_at": "2026-09-10T10:00:00+08:00",
+      "duration": "30m",
+      "current_value": "processed_jobs=0 jobs/min",
+      "threshold": "processed_jobs < 5 jobs/min",
+      "impact": "队列待处理任务由120增长到780，30分钟内无完成任务。"
+    },
+    "related_logs": [
+      {
+        "timestamp": "2026-09-10T09:30:00+08:00",
+        "level": "WARN",
+        "service": "sidekiq-scheduler",
+        "instance": "sidekiq-demo-02",
+        "message": "queue=default queue_size=120 processed_jobs_per_minute=0"
+      },
+      {
+        "timestamp": "2026-09-10T09:31:00+08:00",
+        "level": "ERROR",
+        "service": "sidekiq-scheduler",
+        "instance": "sidekiq-demo-02",
+        "message": "Redis::CannotConnectError endpoint=redis-demo.internal:6379 connection timed out"
+      },
+      {
+        "timestamp": "2026-09-10T10:00:00+08:00",
+        "level": "WARN",
+        "service": "sidekiq-scheduler",
+        "instance": "sidekiq-demo-02",
+        "message": "queue=default queue_size=780 processed_jobs_per_minute=0 process_alive=true"
+      }
+    ]
+  },
+  {
+    "scenario_id": "blackbox_probe_failures_001",
+    "display_name": "黑盒探针失败（外部探测异常）",
+    "alert": {
+      "alert_name": "BlackboxProbeFailures",
+      "description": "黑盒探针失败（外部探测异常）；外部HTTP探测最近10分钟20次中10次失败。",
+      "severity": "SEV2",
+      "service": "gitlab-public-endpoint",
+      "instance": "blackbox-demo-01",
+      "environment": "demo",
+      "data_source": "synthetic_mock_snapshot",
+      "active_at": "2026-09-10T09:48:00+08:00",
+      "observed_at": "2026-09-10T10:00:00+08:00",
+      "duration": "12m",
+      "current_value": "probe_success_ratio=50%",
+      "threshold": "probe_success_ratio < 75% for 10m",
+      "impact": "外部HTTP探测最近10分钟20次中10次失败。"
+    },
+    "related_logs": [
+      {
+        "timestamp": "2026-09-10T09:48:00+08:00",
+        "level": "ERROR",
+        "service": "gitlab-public-endpoint",
+        "instance": "blackbox-demo-01",
+        "message": "target=https://gitlab-demo.example probe_success=0 tls_handshake_error=\"x509: certificate has expired\""
+      },
+      {
+        "timestamp": "2026-09-10T09:49:00+08:00",
+        "level": "INFO",
+        "service": "gitlab-public-endpoint",
+        "instance": "blackbox-demo-01",
+        "message": "target=https://gitlab-demo.example probe_success=1 remote_address=192.0.2.11"
+      },
+      {
+        "timestamp": "2026-09-10T10:00:00+08:00",
+        "level": "WARN",
+        "service": "gitlab-public-endpoint",
+        "instance": "blackbox-demo-01",
+        "message": "target=https://gitlab-demo.example window=10m probes=20 failures=10"
+      }
+    ]
+  },
+  {
+    "scenario_id": "cloud_sql_database_down_001",
+    "display_name": "Cloud SQL 数据库宕机",
+    "alert": {
+      "alert_name": "CloudSQLDatabaseDown",
+      "description": "Cloud SQL 数据库宕机；应用端最近5分钟200次数据库连接尝试全部失败。",
+      "severity": "SEV1",
+      "service": "gitlab-cloudsql",
+      "instance": "cloudsql-demo-01",
+      "environment": "demo",
+      "data_source": "synthetic_mock_snapshot",
+      "active_at": "2026-09-10T09:52:00+08:00",
+      "observed_at": "2026-09-10T10:00:00+08:00",
+      "duration": "8m",
+      "current_value": "database_available=0",
+      "threshold": "database_available < 1",
+      "impact": "应用端最近5分钟200次数据库连接尝试全部失败。"
+    },
+    "related_logs": [
+      {
+        "timestamp": "2026-09-10T09:52:00+08:00",
+        "level": "ERROR",
+        "service": "gitlab-cloudsql",
+        "instance": "cloudsql-demo-01",
+        "message": "database=gitlab_demo connect_attempt=1 connection refused"
+      },
+      {
+        "timestamp": "2026-09-10T09:53:00+08:00",
+        "level": "INFO",
+        "service": "gitlab-cloudsql",
+        "instance": "cloudsql-demo-01",
+        "message": "instance_state=MAINTENANCE operation=demo-op-51 operation_status=RUNNING"
+      },
+      {
+        "timestamp": "2026-09-10T10:00:00+08:00",
+        "level": "WARN",
+        "service": "gitlab-cloudsql",
+        "instance": "cloudsql-demo-01",
+        "message": "window=5m connection_attempts=200 connection_failures=200 database_available=0"
+      }
+    ]
+  },
+  {
+    "scenario_id": "gitaly_repository_corruption_001",
+    "display_name": "Gitaly 仓库损坏（非正常关闭后）",
+    "alert": {
+      "alert_name": "Restoring gitaly data corruption on a project after an unclean shutdown",
+      "description": "Gitaly 仓库损坏（非正常关闭后）；demo/team-alpha 仓库页面20次请求均返回5xx，其他仓库探测正常。",
+      "severity": "SEV2",
+      "service": "gitaly",
+      "instance": "gitaly-demo-01",
+      "environment": "demo",
+      "data_source": "synthetic_mock_snapshot",
+      "active_at": "2026-09-10T09:40:00+08:00",
+      "observed_at": "2026-09-10T10:00:00+08:00",
+      "duration": "20m",
+      "current_value": "project_http_5xx=100% (20/20 requests)",
+      "threshold": "event rule: repository read error count > 0",
+      "impact": "demo/team-alpha 仓库页面20次请求均返回5xx，其他仓库探测正常。"
+    },
+    "related_logs": [
+      {
+        "timestamp": "2026-09-10T09:40:00+08:00",
+        "level": "WARN",
+        "service": "gitaly",
+        "instance": "gitaly-demo-01",
+        "message": "host_boot_id=demo-boot-02 previous_shutdown_clean=false"
+      },
+      {
+        "timestamp": "2026-09-10T09:41:00+08:00",
+        "level": "ERROR",
+        "service": "gitaly",
+        "instance": "gitaly-demo-01",
+        "message": "repository=demo/team-alpha refs/heads/master: invalid sha1 pointer 0000000000000000000000000000000000000000"
+      },
+      {
+        "timestamp": "2026-09-10T10:00:00+08:00",
+        "level": "ERROR",
+        "service": "gitaly",
+        "instance": "gitaly-demo-01",
+        "message": "repository=demo/team-alpha rpc=FindCommit status=Internal project_http_5xx=20/20 other_repository_probe=success"
+      }
+    ]
+  },
+  {
+    "scenario_id": "elk_mapper_parsing_exception_001",
+    "display_name": "ELK Mapper 解析异常",
+    "alert": {
+      "alert_name": "mapper_parsing_exception",
+      "description": "ELK Mapper 解析异常；最近5分钟240条事件写入被拒绝，积压事件数为240。",
+      "severity": "SEV3",
+      "service": "pubsubbeat",
+      "instance": "pubsubbeat-demo-01",
+      "environment": "demo",
+      "data_source": "synthetic_mock_snapshot",
+      "active_at": "2026-09-10T09:45:00+08:00",
+      "observed_at": "2026-09-10T10:00:00+08:00",
+      "duration": "15m",
+      "current_value": "index_rejections=240 events/5m",
+      "threshold": "event rule: mapper_parsing_exception count > 0",
+      "impact": "最近5分钟240条事件写入被拒绝，积压事件数为240。"
+    },
+    "related_logs": [
+      {
+        "timestamp": "2026-09-10T09:45:00+08:00",
+        "level": "WARN",
+        "service": "pubsubbeat",
+        "instance": "pubsubbeat-demo-01",
+        "message": "index=demo-logs-2026.09.10 status=400 mapper_parsing_exception: object mapping for [json.peer.address] tried to parse field [peer.address] as object, but found a concrete value"
+      },
+      {
+        "timestamp": "2026-09-10T09:46:00+08:00",
+        "level": "INFO",
+        "service": "pubsubbeat",
+        "instance": "pubsubbeat-demo-01",
+        "message": "sample_event={\"json\":{\"peer\":{\"address\":\"192.0.2.20\"}}} mapping_type(json.peer.address)=object"
+      },
+      {
+        "timestamp": "2026-09-10T10:00:00+08:00",
+        "level": "WARN",
+        "service": "pubsubbeat",
+        "instance": "pubsubbeat-demo-01",
+        "message": "window=5m index_rejections=240 backlog_events=240"
+      }
+    ]
+  },
+  {
+    "scenario_id": "kube_containers_waiting_in_error_001",
+    "display_name": "Kubernetes 容器等待启动错误",
+    "alert": {
+      "alert_name": "KubeContainersWaitingInError",
+      "description": "Kubernetes 容器等待启动错误；4个待启动容器中3个处于错误状态；旧版本2个副本仍Ready。",
+      "severity": "SEV2",
+      "service": "gitlab-web-deployment",
+      "instance": "web-demo-rollout-01",
+      "environment": "demo",
+      "data_source": "synthetic_mock_snapshot",
+      "active_at": "2026-09-10T09:46:00+08:00",
+      "observed_at": "2026-09-10T10:00:00+08:00",
+      "duration": "14m",
+      "current_value": "waiting_error_ratio=75% (3/4 waiting containers)",
+      "threshold": "waiting_error_ratio > 50%",
+      "impact": "4个待启动容器中3个处于错误状态；旧版本2个副本仍Ready。"
+    },
+    "related_logs": [
+      {
+        "timestamp": "2026-09-10T09:46:00+08:00",
+        "level": "WARN",
+        "service": "gitlab-web-deployment",
+        "instance": "web-demo-rollout-01",
+        "message": "namespace=demo deployment=gitlab-web container=web reason=CrashLoopBackOff restart_count=5"
+      },
+      {
+        "timestamp": "2026-09-10T09:47:00+08:00",
+        "level": "ERROR",
+        "service": "gitlab-web-deployment",
+        "instance": "web-demo-rollout-01",
+        "message": "container=web startup_failed: required environment variable DATABASE_URL is missing"
+      },
+      {
+        "timestamp": "2026-09-10T10:00:00+08:00",
+        "level": "INFO",
+        "service": "gitlab-web-deployment",
+        "instance": "web-demo-rollout-01",
+        "message": "deployment=gitlab-web waiting=4 waiting_in_error=3 previous_revision_ready_replicas=2"
+      }
+    ]
+  },
+  {
+    "scenario_id": "patroni_deadlocks_detected_001",
+    "display_name": "Patroni 检测到死锁",
+    "alert": {
+      "alert_name": "PatroniDeadlocksDetected",
+      "description": "Patroni 检测到死锁；最近5分钟18个事务因死锁回滚，数据库仍接受连接。",
+      "severity": "SEV3",
+      "service": "patroni-postgresql",
+      "instance": "patroni-demo-01",
+      "environment": "demo",
+      "data_source": "synthetic_mock_snapshot",
+      "active_at": "2026-09-10T09:50:00+08:00",
+      "observed_at": "2026-09-10T10:00:00+08:00",
+      "duration": "10m",
+      "current_value": "deadlocks=18/5m",
+      "threshold": "deadlocks > 5/5m",
+      "impact": "最近5分钟18个事务因死锁回滚，数据库仍接受连接。"
+    },
+    "related_logs": [
+      {
+        "timestamp": "2026-09-10T09:50:00+08:00",
+        "level": "ERROR",
+        "service": "patroni-postgresql",
+        "instance": "patroni-demo-01",
+        "message": "deadlock detected: Process 123 waits for transaction 456 held by process 789; process 789 waits for transaction 654 held by process 123"
+      },
+      {
+        "timestamp": "2026-09-10T09:51:00+08:00",
+        "level": "INFO",
+        "service": "patroni-postgresql",
+        "instance": "patroni-demo-01",
+        "message": "pid=123 statement=\"UPDATE accounts SET balance=balance-1 WHERE id=2\"; pid=789 statement=\"UPDATE accounts SET balance=balance+1 WHERE id=1\""
+      },
+      {
+        "timestamp": "2026-09-10T10:00:00+08:00",
+        "level": "WARN",
+        "service": "patroni-postgresql",
+        "instance": "patroni-demo-01",
+        "message": "window=5m deadlocks=18 rolled_back_transactions=18 database_connections_accepted=true"
+      }
+    ]
+  },
+  {
+    "scenario_id": "postgres_data_corruption_001",
+    "display_name": "PostgreSQL 数据损坏",
+    "alert": {
+      "alert_name": "Dealing with Data Corruption in PostgreSQL",
+      "description": "PostgreSQL 数据损坏；gitlab_demo 数据库关系base/16401/33909读取失败12次，其他关系探测成功。",
+      "severity": "SEV1",
+      "service": "postgresql-main",
+      "instance": "postgres-demo-01",
+      "environment": "demo",
+      "data_source": "synthetic_mock_snapshot",
+      "active_at": "2026-09-10T09:44:00+08:00",
+      "observed_at": "2026-09-10T10:00:00+08:00",
+      "duration": "16m",
+      "current_value": "page_read_errors=12/5m",
+      "threshold": "event rule: invalid page or checksum error count > 0",
+      "impact": "gitlab_demo 数据库关系base/16401/33909读取失败12次，其他关系探测成功。"
+    },
+    "related_logs": [
+      {
+        "timestamp": "2026-09-10T09:44:00+08:00",
+        "level": "ERROR",
+        "service": "postgresql-main",
+        "instance": "postgres-demo-01",
+        "message": "database=gitlab_demo could not read block 0 in file \"base/16401/33909\": read only 0 of 8192 bytes"
+      },
+      {
+        "timestamp": "2026-09-10T09:45:00+08:00",
+        "level": "WARN",
+        "service": "postgresql-main",
+        "instance": "postgres-demo-01",
+        "message": "database=gitlab_demo page verification failed, calculated checksum 726 but expected 827"
+      },
+      {
+        "timestamp": "2026-09-10T10:00:00+08:00",
+        "level": "ERROR",
+        "service": "postgresql-main",
+        "instance": "postgres-demo-01",
+        "message": "database=gitlab_demo invalid page in block 0 of relation base/16401/33909; window=5m page_read_errors=12 other_relation_probe=success"
+      }
+    ]
+  },
+  {
+    "scenario_id": "postgresql_disk_space_001",
+    "display_name": "PostgreSQL 磁盘空间不足",
+    "alert": {
+      "alert_name": "PostgreSQL",
+      "description": "PostgreSQL 磁盘空间不足；数据库写入因空间不足失败，数据盘剩余1 GiB。",
+      "severity": "SEV1",
+      "service": "postgresql-main",
+      "instance": "postgres-demo-02",
+      "environment": "demo",
+      "data_source": "synthetic_mock_snapshot",
+      "active_at": "2026-09-10T09:38:00+08:00",
+      "observed_at": "2026-09-10T10:00:00+08:00",
+      "duration": "22m",
+      "current_value": "disk_used=99.5% (199/200 GiB)",
+      "threshold": "disk_used > 95%",
+      "impact": "数据库写入因空间不足失败，数据盘剩余1 GiB。"
+    },
+    "related_logs": [
+      {
+        "timestamp": "2026-09-10T09:38:00+08:00",
+        "level": "WARN",
+        "service": "postgresql-main",
+        "instance": "postgres-demo-02",
+        "message": "mount=/var/opt/gitlab/postgresql/data capacity_gib=200 used_gib=199 pg_wal_size_gib=120"
+      },
+      {
+        "timestamp": "2026-09-10T09:39:00+08:00",
+        "level": "ERROR",
+        "service": "postgresql-main",
+        "instance": "postgres-demo-02",
+        "message": "could not write to file \"pg_wal/xlogtemp.42\": No space left on device"
+      },
+      {
+        "timestamp": "2026-09-10T10:00:00+08:00",
+        "level": "INFO",
+        "service": "postgresql-main",
+        "instance": "postgres-demo-02",
+        "message": "replication_slot=demo_replica_02 active=false retained_wal_gib=118; window=5m write_failures=45"
+      }
+    ]
+  },
+  {
+    "scenario_id": "sidekiq_error_rate_high_001",
+    "display_name": "Sidekiq 错误率超标",
+    "alert": {
+      "alert_name": "Sidekiq's error ratio exceeding SLO",
+      "description": "Sidekiq 错误率超标；最近5分钟500个任务中60个失败，失败集中于ReactiveCachingWorker。",
+      "severity": "SEV2",
+      "service": "sidekiq-reactive-cache",
+      "instance": "sidekiq-demo-03",
+      "environment": "demo",
+      "data_source": "synthetic_mock_snapshot",
+      "active_at": "2026-09-10T09:49:00+08:00",
+      "observed_at": "2026-09-10T10:00:00+08:00",
+      "duration": "11m",
+      "current_value": "job_error_ratio=12% (60/500 jobs)",
+      "threshold": "demo job_error_ratio > 1.5%",
+      "impact": "最近5分钟500个任务中60个失败，失败集中于ReactiveCachingWorker。"
+    },
+    "related_logs": [
+      {
+        "timestamp": "2026-09-10T09:49:00+08:00",
+        "level": "ERROR",
+        "service": "sidekiq-reactive-cache",
+        "instance": "sidekiq-demo-03",
+        "message": "worker=ReactiveCachingWorker jid=demo-c1 Errno::EHOSTUNREACH Failed to open TCP connection to 192.0.2.188:8089 (No route to host)"
+      },
+      {
+        "timestamp": "2026-09-10T09:50:00+08:00",
+        "level": "WARN",
+        "service": "sidekiq-reactive-cache",
+        "instance": "sidekiq-demo-03",
+        "message": "worker=ReactiveCachingWorker jid=demo-c1 retry_count=4 endpoint=192.0.2.188:8089"
+      },
+      {
+        "timestamp": "2026-09-10T10:00:00+08:00",
+        "level": "INFO",
+        "service": "sidekiq-reactive-cache",
+        "instance": "sidekiq-demo-03",
+        "message": "window=5m jobs=500 failures=60 failed_worker=ReactiveCachingWorker other_workers_failures=0"
+      }
+    ]
+  }
+]

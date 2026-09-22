@@ -1,0 +1,102 @@
+{
+  "incident": {
+    "id": "0c79580e-a4ab-4170-82fd-00581bad34b1",
+    "scenarioId": "postgres_data_corruption_001",
+    "scenarioName": "PostgreSQL 数据损坏",
+    "symptoms": "分析当前告警，说明已观察的问题、尚未确认的原因及有来源的检查步骤和前提。",
+    "alertsJson": "{\r\n  \"success\" : true,\r\n  \"alerts\" : [ {\r\n    \"severity\" : \"SEV1\",\r\n    \"service\" : \"postgresql-main\",\r\n    \"current_value\" : \"page_read_errors=12/5m\",\r\n    \"threshold\" : \"event rule: invalid page or checksum error count > 0\",\r\n    \"instance\" : \"postgres-demo-01\",\r\n    \"environment\" : \"demo\",\r\n    \"data_source\" : \"synthetic_mock_snapshot\",\r\n    \"observed_at\" : \"2026-09-10T10:00:00+08:00\",\r\n    \"impact\" : \"gitlab_demo 数据库关系base/16401/33909读取失败12次，其他关系探测成功。\",\r\n    \"alert_name\" : \"Dealing with Data Corruption in PostgreSQL\",\r\n    \"description\" : \"PostgreSQL 数据损坏；gitlab_demo 数据库关系base/16401/33909读取失败12次，其他关系探测成功。\",\r\n    \"state\" : \"firing\",\r\n    \"active_at\" : \"2026-09-10T09:44:00+08:00\",\r\n    \"duration\" : \"16m\"\r\n  } ],\r\n  \"message\" : \"成功检索到 1 个活动告警\",\r\n  \"error\" : null\r\n}",
+    "logsJson": "{\r\n  \"success\" : true,\r\n  \"region\" : \"ap-guangzhou\",\r\n  \"log_topic\" : \"application-logs\",\r\n  \"query\" : \"DEFAULT_QUERY\",\r\n  \"logs\" : [ {\r\n    \"timestamp\" : \"2026-09-10T09:44:00+08:00\",\r\n    \"level\" : \"ERROR\",\r\n    \"service\" : \"postgresql-main\",\r\n    \"instance\" : \"postgres-demo-01\",\r\n    \"message\" : \"database=gitlab_demo could not read block 0 in file \\\"base/16401/33909\\\": read only 0 of 8192 bytes\",\r\n    \"metrics\" : { }\r\n  }, {\r\n    \"timestamp\" : \"2026-09-10T09:45:00+08:00\",\r\n    \"level\" : \"WARN\",\r\n    \"service\" : \"postgresql-main\",\r\n    \"instance\" : \"postgres-demo-01\",\r\n    \"message\" : \"database=gitlab_demo page verification failed, calculated checksum 726 but expected 827\",\r\n    \"metrics\" : { }\r\n  }, {\r\n    \"timestamp\" : \"2026-09-10T10:00:00+08:00\",\r\n    \"level\" : \"ERROR\",\r\n    \"service\" : \"postgresql-main\",\r\n    \"instance\" : \"postgres-demo-01\",\r\n    \"message\" : \"database=gitlab_demo invalid page in block 0 of relation base/16401/33909; window=5m page_read_errors=12 other_relation_probe=success\",\r\n    \"metrics\" : { }\r\n  } ],\r\n  \"total\" : 3,\r\n  \"message\" : \"成功查询到 3 条日志\"\r\n}",
+    "capturedAt": "2026-09-15T16:07:38.636700400Z"
+  },
+  "evidence": [
+    {
+      "id": "A1",
+      "documentId": "",
+      "version": "0c79580e-a4ab-4170-82fd-00581bad34b1",
+      "sourceFile": "PostgreSQL 数据损坏",
+      "title": "A1",
+      "start": 0,
+      "end": 521,
+      "content": "severity: SEV1\nservice: postgresql-main\ncurrent_value: page_read_errors=12/5m\nthreshold: event rule: invalid page or checksum error count > 0\ninstance: postgres-demo-01\nenvironment: demo\ndata_source: synthetic_mock_snapshot\nobserved_at: 2026-09-10T10:00:00+08:00\nimpact: gitlab_demo 数据库关系base/16401/33909读取失败12次，其他关系探测成功。\nalert_name: Dealing with Data Corruption in PostgreSQL\ndescription: PostgreSQL 数据损坏；gitlab_demo 数据库关系base/16401/33909读取失败12次，其他关系探测成功。\nstate: firing\nactive_at: 2026-09-10T09:44:00+08:00\nduration: 16m",
+      "kind": "observation"
+    },
+    {
+      "id": "L1",
+      "documentId": "",
+      "version": "0c79580e-a4ab-4170-82fd-00581bad34b1",
+      "sourceFile": "PostgreSQL 数据损坏",
+      "title": "L1",
+      "start": 0,
+      "end": 220,
+      "content": "timestamp: 2026-09-10T09:44:00+08:00\nlevel: ERROR\nservice: postgresql-main\ninstance: postgres-demo-01\nmessage: database=gitlab_demo could not read block 0 in file \"base/16401/33909\": read only 0 of 8192 bytes\nmetrics: {}",
+      "kind": "observation"
+    },
+    {
+      "id": "L2",
+      "documentId": "",
+      "version": "0c79580e-a4ab-4170-82fd-00581bad34b1",
+      "sourceFile": "PostgreSQL 数据损坏",
+      "title": "L2",
+      "start": 0,
+      "end": 209,
+      "content": "timestamp: 2026-09-10T09:45:00+08:00\nlevel: WARN\nservice: postgresql-main\ninstance: postgres-demo-01\nmessage: database=gitlab_demo page verification failed, calculated checksum 726 but expected 827\nmetrics: {}",
+      "kind": "observation"
+    },
+    {
+      "id": "L3",
+      "documentId": "",
+      "version": "0c79580e-a4ab-4170-82fd-00581bad34b1",
+      "sourceFile": "PostgreSQL 数据损坏",
+      "title": "L3",
+      "start": 0,
+      "end": 256,
+      "content": "timestamp: 2026-09-10T10:00:00+08:00\nlevel: ERROR\nservice: postgresql-main\ninstance: postgres-demo-01\nmessage: database=gitlab_demo invalid page in block 0 of relation base/16401/33909; window=5m page_read_errors=12 other_relation_probe=success\nmetrics: {}",
+      "kind": "observation"
+    },
+    {
+      "id": "D-bfa2d02df73faab362d3",
+      "documentId": "06043c63-a4ad-42e0-b447-d3792daf0077",
+      "version": "6da529bf-2263-4a39-ad98-7e6befbebb5c",
+      "sourceFile": "gitlab__docs__patroni__postgres-data-corruption.md",
+      "title": "Detecting corrupted data",
+      "start": 367,
+      "end": 1476,
+      "content": "## Detecting corrupted data\n\n1. If [data checksum](https://www.postgresql.org/docs/11/app-initdb.html#APP-INITDB-DATA-CHECKSUMS) is `off`, the most common way a corruption event will be detected is by looking for strings like this in the postgreSQL logs (after a query error):\n\n```\ncould not read block ZZZZ in file \"base/16401/33909\": read only 0 of NNNN bytes\n```\n\n2. When [data checksum](https://www.postgresql.org/docs/11/app-initdb.html#APP-INITDB-DATA-CHECKSUMS) is `on`, a different meesage could be seen in the logs:\n\n```\nWARNING: page verification failed, calculated checksum 726 but expected 827\nERROR: invalid page in block 0 of relation base/16401/33909\n\n```\n\nImportant numbers to identify:\n\n- 16401 represent the oid of the database, as in\n\n```\ngitlabhq_production=# select oid,datname from pg_database;\n  oid  |       datname\n-------+---------------------\n 13052 | template0\n 16400 | template1\n 20485 | postgres\n 16401 | gitlabhq_production\n(4 rows)\n```\n\n- 33909 corresponds to what is called the `filenode`. You can find wich relation corresponds to `base/16401/33909` with the following query:",
+      "kind": "document"
+    },
+    {
+      "id": "D-70024ebef885efcb19f7",
+      "documentId": "06043c63-a4ad-42e0-b447-d3792daf0077",
+      "version": "6da529bf-2263-4a39-ad98-7e6befbebb5c",
+      "sourceFile": "gitlab__docs__patroni__postgres-data-corruption.md",
+      "title": "Dealing with Data Corruption in PostgreSQL",
+      "start": 0,
+      "end": 365,
+      "content": "# Dealing with Data Corruption in PostgreSQL\n\nData corruption in PostgreSQL is a very unlilely, but possible scenario. Common causes of data corruption involves:\n\n- Faulty Disks\n- Faulty RAID controlers\n- Defective RAM\n- Usage of [fsync=off](https://postgresqlco.nf/doc/en/param/fsync/) and a OS crash or power loss\n- OS bugs\n- PostgreSQL bugs\n- Administrator error",
+      "kind": "document"
+    },
+    {
+      "id": "D-8c7bd6514c5f33be1f7e",
+      "documentId": "06043c63-a4ad-42e0-b447-d3792daf0077",
+      "version": "6da529bf-2263-4a39-ad98-7e6befbebb5c",
+      "sourceFile": "gitlab__docs__patroni__postgres-data-corruption.md",
+      "title": "What to when finding corrupted data",
+      "start": 1989,
+      "end": 3159,
+      "content": "## What to when finding corrupted data\n\n- If this has happen in a replica (and every other host is okay), the easiest way to solve this is by draining the traffic and recreate a new node, as in [replica maintenance](patroni-management.md#replica-maintenance) and [recreate a replica](patroni-management.md#problems-with-replication-after-failover)\n\n- If this problems affects the leader, then:\n\n  - If the relation is an index, you could:\n    - [REINDEX CONCURRENTLY](https://www.postgresql.org/docs/12/sql-reindex.html#SQL-REINDEX-CONCURRENTLY) (only for PostgreSQL >=12), or\n    - Re-create the index. (i)\n\n  - If the relation is a table, you could:\n    - verify wich row/s are affected (ii)\n    - Contact DBRE and OnGres for support\n\n(i) To recreate the index, you could follow this steps:\n\n1. Find how this index is defined:\n\n```\ngitlabhq_production=# select pg_get_indexdef('index_on_users_lower_email'::regclass);\n                                      pg_get_indexdef\n--------------------------------------------------------------------------------------------\n CREATE INDEX index_on_users_lower_email ON public.users USING btree (lower((email)::text))\n(1 row)\n```",
+      "kind": "document"
+    },
+    {
+      "id": "D-1fdb2b74dc29fe4942ad",
+      "documentId": "06043c63-a4ad-42e0-b447-d3792daf0077",
+      "version": "6da529bf-2263-4a39-ad98-7e6befbebb5c",
+      "sourceFile": "gitlab__docs__patroni__postgres-data-corruption.md",
+      "title": "原文读取",
+      "start": 0,
+      "end": 4351,
+      "content": "# Dealing with Data Corruption in PostgreSQL\n\nData corruption in PostgreSQL is a very unlilely, but possible scenario. Common causes of data corruption involves:\n\n- Faulty Disks\n- Faulty RAID controlers\n- Defective RAM\n- Usage of [fsync=off](https://postgresqlco.nf/doc/en/param/fsync/) and a OS crash or power loss\n- OS bugs\n- PostgreSQL bugs\n- Administrator error\n\n## Detecting corrupted data\n\n1. If [data checksum](https://www.postgresql.org/docs/11/app-initdb.html#APP-INITDB-DATA-CHECKSUMS) is `off`, the most common way a corruption event will be detected is by looking for strings like this in the postgreSQL logs (after a query error):\n\n```\ncould not read block ZZZZ in file \"base/16401/33909\": read only 0 of NNNN bytes\n```\n\n2. When [data checksum](https://www.postgresql.org/docs/11/app-initdb.html#APP-INITDB-DATA-CHECKSUMS) is `on`, a different meesage could be seen in the logs:\n\n```\nWARNING: page verification failed, calculated checksum 726 but expected 827\nERROR: invalid page in block 0 of relation base/16401/33909\n\n```\n\nImportant numbers to identify:\n\n- 16401 represent the oid of the database, as in\n\n```\ngitlabhq_production=# select oid,datname from pg_database;\n  oid  |       datname\n-------+---------------------\n 13052 | template0\n 16400 | template1\n 20485 | postgres\n 16401 | gitlabhq_production\n(4 rows)\n```\n\n- 33909 corresponds to what is called the `filenode`. You can find wich relation corresponds to `base/16401/33909` with the following query:\n\n```sql\nselect n.nspname AS schema, c.relkind, c.relname AS relation from pg_class c inner join pg_namespace n on (c.relnamespace = n.oid) where c.relfilenode =33909;\n```\n\n```\n schema | relkind | relation\n--------+---------+----------\n public | r       | users\n(1 row)\n```\n\n_Note_: Common values for `relkind` column are:\n\n- r for regular tables\n- i for indexes\n- t for TOAST tables\n\nFor more details about this, check the [Official Documentation](https://www.postgresql.org/docs/current/catalog-pg-class.html)\n\n## What to when finding corrupted data\n\n- If this has happen in a replica (and every other host is okay), the easiest way to solve this is by draining the traffic and recreate a new node, as in [replica maintenance](patroni-management.md#replica-maintenance) and [recreate a replica](patroni-management.md#problems-with-replication-after-failover)\n\n- If this problems affects the leader, then:\n\n  - If the relation is an index, you could:\n    - [REINDEX CONCURRENTLY](https://www.postgresql.org/docs/12/sql-reindex.html#SQL-REINDEX-CONCURRENTLY) (only for PostgreSQL >=12), or\n    - Re-create the index. (i)\n\n  - If the relation is a table, you could:\n    - verify wich row/s are affected (ii)\n    - Contact DBRE and OnGres for support\n\n(i) To recreate the index, you could follow this steps:\n\n1. Find how this index is defined:\n\n```\ngitlabhq_production=# select pg_get_indexdef('index_on_users_lower_email'::regclass);\n                                      pg_get_indexdef\n--------------------------------------------------------------------------------------------\n CREATE INDEX index_on_users_lower_email ON public.users USING btree (lower((email)::text))\n(1 row)\n```\n\n1. Use a different name for the new index, and use CONCURRENTLY:\n\n```sql\nCREATE INDEX CONCURRENTLY index_on_users_lower_email_new ON public.users USING btree (lower((email)::text))\n```\n\n1. Drop the corrupted index:\n\n```sql\nDROP INDEX CONCURRENTLY index_on_users_lower_email\n```\n\n1. Rename the new index to the droped one:\n\n```sql\nALTER INDEX index_on_users_lower_email_new RENAME TO index_on_users_lower_email\n```\n\n(ii) To verify wich rows were affected by the corruption event: Probably the easiest way to do it is by using `FETCH_COUNT 1` in a `gitlab-psql session`. That allows results to be seen as it happens:\n\n```\ngitlabhq_production=# \\set FETCH_COUNT 1\ngitlabhq_production=# \\pset pager off\nPager usage is off.\ngitlabhq_production=# select ctid,* from users;\n```\n\nAnd check for errors, like\n\n```\n (439,226) |           99878\n (439,227) |           99879\nserver closed the connection unexpectedly\n        This probably means the server terminated abnormally\n        before or while processing the request.\nThe connection to the server was lost. Attempting reset: Failed.\n```\n\nThat will show the last readable row. DBRE and/or DB Support should analyze the best path to go from here.\n",
+      "kind": "document"
+    }
+  ],
+  "auditedOutput": "{\n  \"findings\": [\n    {\n      \"text\": \"PostgreSQL 实例 postgres-demo-01 上 gitlab_demo 数据库（OID 16401）中关系 filenode=33909 发生局部数据损坏，表现为连续读取 block 0 失败：L1 'could not read block 0'、L2 'page verification failed, checksum 726 vs 827'、L3 'invalid page in block 0'；5 分钟内 page_read_errors=12；其他关系探测成功。\",\n      \"certainty\": \"observation\",\n      \"citations\": [\n        {\n          \"id\": \"A1\",\n          \"quote\": \"impact: gitlab_demo 数据库关系base/16401/33909读取失败12次，其他关系探测成功。\\ndescription: PostgreSQL 数据损坏；gitlab_demo 数据库关系base/16401/33909读取失败12次，其他关系探测成功。\"\n        },\n        {\n          \"id\": \"L1\",\n          \"quote\": \"message: database=gitlab_demo could not read block 0 in file \\\"base/16401/33909\\\": read only 0 of 8192 bytes\"\n        },\n        {\n          \"id\": \"L2\",\n          \"quote\": \"message: database=gitlab_demo page verification failed, calculated checksum 726 but expected 827\"\n        },\n        {\n          \"id\": \"L3\",\n          \"quote\": \"message: database=gitlab_demo invalid page in block 0 of relation base/16401/33909; window=5m page_read_errors=12 other_relation_probe=success\"\n        }\n      ]\n    },\n    {\n      \"text\": \"当前日志模式（L1+L2+L3 组合）明确表明 data_checksums 已启用，因文档 D-bfa2d02df73faab362d3 指出该组合仅在 checksum on 时出现。\",\n      \"certainty\": \"supported\",\n      \"citations\": [\n        {\n          \"id\": \"D-bfa2d02df73faab362d3\",\n          \"quote\": \"2. When [data checksum](https://www.postgresql.org/docs/11/app-initdb.html#APP-INITDB-DATA-CHECKSUMS) is `on`, a different meesage could be seen in the logs:\\n\\n```\\nWARNING: page verification failed, calculated checksum 726 but expected 827\\nERROR: invalid page in block 0 of relation base/16401/33909\\n\\n```\"\n        }\n      ]\n    }\n  ],\n  \"actions\": [\n    {\n      \"text\": \"确认数据库 OID 16401 对应 gitlab_demo —— 执行 SELECT oid,datname FROM pg_database WHERE oid = 16401;\",\n      \"command\": \"SELECT oid,datname FROM pg_database WHERE oid = 16401;\",\n      \"prerequisites\": \"\",\n      \"citations\": [\n        {\n          \"id\": \"D-bfa2d02df73faab362d3\",\n          \"quote\": \"- 16401 represent the oid of the database, as in\\n\\n```\\ngitlabhq_production=# select oid,datname from pg_database;\\n  oid  |       datname\\n-------+---------------------\\n 13052 | template0\\n 16400 | template1\\n 20485 | postgres\\n 16401 | gitlabhq_production\\n(4 rows)\\n```\"\n        }\n      ]\n    },\n    {\n      \"text\": \"确定 filenode 33909 对应的关系类型（表/索引/TOAST）及名称 —— 执行 SELECT n.nspname AS schema, c.relkind, c.relname FROM pg_class c JOIN pg_namespace n ON c.relnamespace = n.oid WHERE c.relfilenode = 33909;\",\n      \"command\": \"SELECT n.nspname AS schema, c.relkind, c.relname FROM pg_class c JOIN pg_namespace n ON c.relnamespace = n.oid WHERE c.relfilenode = 33909;\",\n      \"prerequisites\": \"\",\n      \"citations\": [\n        {\n          \"id\": \"D-1fdb2b74dc29fe4942ad\",\n          \"quote\": \"You can find wich relation corresponds to `base/16401/33909` with the following query:\\n\\n```sql\\nselect n.nspname AS schema, c.relkind, c.relname AS relation from pg_class c inner join pg_namespace n on (c.relnamespace = n.oid) where c.relfilenode =33909;\\n```\\n\\n```\\n schema | relkind | relation\\n--------+---------+----------\\n public | r       | users\\n(1 row)\\n```\\n\\n_Note_: Common values for `relkind` column are:\\n\\n- r for regular tables\\n- i for indexes\\n- t for TOAST tables\"\n        }\n      ]\n    },\n    {\n      \"text\": \"确认 Patroni 角色：若为 replica，可直接重建节点；若为 leader，需按关系类型（表/索引）执行不同处置路径。\",\n      \"command\": \"\",\n      \"prerequisites\": \"必须先确认该实例是否为 Patroni leader —— 文档 D-8c7bd6514c5f33be1f7e 明确区分 replica 与 leader 的处置路径：replica 可重建；leader 需先判别 relkind 再决定 REINDEX 或联系 DBRE。\",\n      \"citations\": [\n        {\n          \"id\": \"D-8c7bd6514c5f33be1f7e\",\n          \"quote\": \"- If this has happen in a replica (and every other host is okay), the easiest way to solve this is by draining the traffic and recreate a new node, as in [replica maintenance](patroni-management.md#replica-maintenance) and [recreate a replica](patroni-management.md#problems-with-replication-after-failover)\\n\\n- If this problems affects the leader, then:\\n\\n  - If the relation is an index, you could:\\n    - [REINDEX CONCURRENTLY](https://www.postgresql.org/docs/12/sql-reindex.html#SQL-REINDEX-CONCURRENTLY) (only for PostgreSQL >=12), or\\n    - Re-create the index. (i)\\n\\n  - If the relation is a table, you could:\\n    - verify wich row/s are affected (ii)\\n    - Contact DBRE and OnGres for support\"\n        }\n      ]\n    }\n  ],\n  \"missingEvidence\": [\n    \"pg_database 查询结果（验证 oid 16401 → gitlab_demo）\",\n    \"pg_class 关联查询结果（确认 relkind 和 relname）\",\n    \"Patroni 角色状态（leader 或 replica）\"\n  ]\n}"
+}

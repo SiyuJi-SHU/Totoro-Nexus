@@ -1,0 +1,124 @@
+{
+  "incident": {
+    "id": "078b9a5a-d113-4a87-9b05-b4855358075a",
+    "scenarioId": "gitaly_repository_corruption_001",
+    "scenarioName": "Gitaly 仓库损坏（非正常关闭后）",
+    "symptoms": "分析当前告警，说明已观察的问题、尚未确认的原因及有来源的检查步骤和前提。",
+    "alertsJson": "{\r\n  \"success\" : true,\r\n  \"alerts\" : [ {\r\n    \"severity\" : \"SEV2\",\r\n    \"service\" : \"gitaly\",\r\n    \"current_value\" : \"project_http_5xx=100% (20/20 requests)\",\r\n    \"threshold\" : \"event rule: repository read error count > 0\",\r\n    \"instance\" : \"gitaly-demo-01\",\r\n    \"environment\" : \"demo\",\r\n    \"data_source\" : \"synthetic_mock_snapshot\",\r\n    \"observed_at\" : \"2026-09-10T10:00:00+08:00\",\r\n    \"impact\" : \"demo/team-alpha 仓库页面20次请求均返回5xx，其他仓库探测正常。\",\r\n    \"alert_name\" : \"Restoring gitaly data corruption on a project after an unclean shutdown\",\r\n    \"description\" : \"Gitaly 仓库损坏（非正常关闭后）；demo/team-alpha 仓库页面20次请求均返回5xx，其他仓库探测正常。\",\r\n    \"state\" : \"firing\",\r\n    \"active_at\" : \"2026-09-10T09:40:00+08:00\",\r\n    \"duration\" : \"20m\"\r\n  } ],\r\n  \"message\" : \"成功检索到 1 个活动告警\",\r\n  \"error\" : null\r\n}",
+    "logsJson": "{\r\n  \"success\" : true,\r\n  \"region\" : \"ap-guangzhou\",\r\n  \"log_topic\" : \"application-logs\",\r\n  \"query\" : \"DEFAULT_QUERY\",\r\n  \"logs\" : [ {\r\n    \"timestamp\" : \"2026-09-10T09:40:00+08:00\",\r\n    \"level\" : \"WARN\",\r\n    \"service\" : \"gitaly\",\r\n    \"instance\" : \"gitaly-demo-01\",\r\n    \"message\" : \"host_boot_id=demo-boot-02 previous_shutdown_clean=false\",\r\n    \"metrics\" : { }\r\n  }, {\r\n    \"timestamp\" : \"2026-09-10T09:41:00+08:00\",\r\n    \"level\" : \"ERROR\",\r\n    \"service\" : \"gitaly\",\r\n    \"instance\" : \"gitaly-demo-01\",\r\n    \"message\" : \"repository=demo/team-alpha refs/heads/master: invalid sha1 pointer 0000000000000000000000000000000000000000\",\r\n    \"metrics\" : { }\r\n  }, {\r\n    \"timestamp\" : \"2026-09-10T10:00:00+08:00\",\r\n    \"level\" : \"ERROR\",\r\n    \"service\" : \"gitaly\",\r\n    \"instance\" : \"gitaly-demo-01\",\r\n    \"message\" : \"repository=demo/team-alpha rpc=FindCommit status=Internal project_http_5xx=20/20 other_repository_probe=success\",\r\n    \"metrics\" : { }\r\n  } ],\r\n  \"total\" : 3,\r\n  \"message\" : \"成功查询到 3 条日志\"\r\n}",
+    "capturedAt": "2026-09-15T16:07:38.593337300Z"
+  },
+  "evidence": [
+    {
+      "id": "A1",
+      "documentId": "",
+      "version": "078b9a5a-d113-4a87-9b05-b4855358075a",
+      "sourceFile": "Gitaly 仓库损坏（非正常关闭后）",
+      "title": "A1",
+      "start": 0,
+      "end": 532,
+      "content": "severity: SEV2\nservice: gitaly\ncurrent_value: project_http_5xx=100% (20/20 requests)\nthreshold: event rule: repository read error count > 0\ninstance: gitaly-demo-01\nenvironment: demo\ndata_source: synthetic_mock_snapshot\nobserved_at: 2026-09-10T10:00:00+08:00\nimpact: demo/team-alpha 仓库页面20次请求均返回5xx，其他仓库探测正常。\nalert_name: Restoring gitaly data corruption on a project after an unclean shutdown\ndescription: Gitaly 仓库损坏（非正常关闭后）；demo/team-alpha 仓库页面20次请求均返回5xx，其他仓库探测正常。\nstate: firing\nactive_at: 2026-09-10T09:40:00+08:00\nduration: 20m",
+      "kind": "observation"
+    },
+    {
+      "id": "L1",
+      "documentId": "",
+      "version": "078b9a5a-d113-4a87-9b05-b4855358075a",
+      "sourceFile": "Gitaly 仓库损坏（非正常关闭后）",
+      "title": "L1",
+      "start": 0,
+      "end": 166,
+      "content": "timestamp: 2026-09-10T09:40:00+08:00\nlevel: WARN\nservice: gitaly\ninstance: gitaly-demo-01\nmessage: host_boot_id=demo-boot-02 previous_shutdown_clean=false\nmetrics: {}",
+      "kind": "observation"
+    },
+    {
+      "id": "L2",
+      "documentId": "",
+      "version": "078b9a5a-d113-4a87-9b05-b4855358075a",
+      "sourceFile": "Gitaly 仓库损坏（非正常关闭后）",
+      "title": "L2",
+      "start": 0,
+      "end": 219,
+      "content": "timestamp: 2026-09-10T09:41:00+08:00\nlevel: ERROR\nservice: gitaly\ninstance: gitaly-demo-01\nmessage: repository=demo/team-alpha refs/heads/master: invalid sha1 pointer 0000000000000000000000000000000000000000\nmetrics: {}",
+      "kind": "observation"
+    },
+    {
+      "id": "L3",
+      "documentId": "",
+      "version": "078b9a5a-d113-4a87-9b05-b4855358075a",
+      "sourceFile": "Gitaly 仓库损坏（非正常关闭后）",
+      "title": "L3",
+      "start": 0,
+      "end": 223,
+      "content": "timestamp: 2026-09-10T10:00:00+08:00\nlevel: ERROR\nservice: gitaly\ninstance: gitaly-demo-01\nmessage: repository=demo/team-alpha rpc=FindCommit status=Internal project_http_5xx=20/20 other_repository_probe=success\nmetrics: {}",
+      "kind": "observation"
+    },
+    {
+      "id": "D-a08de269fa6d21f7761a",
+      "documentId": "e32777d4-bed2-42ce-bddc-21051c6820a4",
+      "version": "fee712c0-4e5c-42f0-aab5-2bc25582b93f",
+      "sourceFile": "gitlab__docs__gitaly__gitaly-repository-corruption.md",
+      "title": "Restoring gitaly data corruption on a project after an unclean shutdown",
+      "start": 0,
+      "end": 73,
+      "content": "# Restoring gitaly data corruption on a project after an unclean shutdown",
+      "kind": "document"
+    },
+    {
+      "id": "D-d694807356fcb6e095d0",
+      "documentId": "e32777d4-bed2-42ce-bddc-21051c6820a4",
+      "version": "fee712c0-4e5c-42f0-aab5-2bc25582b93f",
+      "sourceFile": "gitlab__docs__gitaly__gitaly-repository-corruption.md",
+      "title": "Detecting corruption",
+      "start": 656,
+      "end": 1126,
+      "content": "## Detecting corruption\n\nWhen viewing a project's main site returns 5xx errors, it might have been a victim of corruption. To confirm, double check with [this dashboard](https://log.gprd.gitlab.net/goto/5d10a91b65b89df295d089f1bd5f8a52) (internal). If it appears there, it has at least parts of it's refs corrupted.\nAny curruption will only surface here if there is traffic on that project. It might get picked up during housekeeping, but then additional damage is done.",
+      "kind": "document"
+    },
+    {
+      "id": "D-b87fc73115bf026dd4ff",
+      "documentId": "1eea5c31-6e8f-4ddb-bf2a-f2ca8abe30b1",
+      "version": "2bc742d5-2018-4ca6-a72d-79eae0e86e4e",
+      "sourceFile": "gitlab__docs__gitaly__gitaly-down.md",
+      "title": "Gitaly is down",
+      "start": 0,
+      "end": 16,
+      "content": "# Gitaly is down",
+      "kind": "document"
+    },
+    {
+      "id": "D-ecede5bebb0136fdc5e2",
+      "documentId": "e32777d4-bed2-42ce-bddc-21051c6820a4",
+      "version": "fee712c0-4e5c-42f0-aab5-2bc25582b93f",
+      "sourceFile": "gitlab__docs__gitaly__gitaly-repository-corruption.md",
+      "title": "原文读取",
+      "start": 0,
+      "end": 8000,
+      "content": "# Restoring gitaly data corruption on a project after an unclean shutdown\n\n## Why does this happen?\n\nFor all we know commits and git objects themselves are not lost, but in some cases refs getting updated might result in them getting stored as an empty file.\nIt is likely, that gitaly wants to update the ref, but did not sync the content to disk before having the host fail, so the file containing the ref was corrupted in the process.\n\nObjects are fine (with errors being detectable that is) as they are hashed, and `fsync()`ed by git (<https://gitlab.com/gitlab-org/gitaly/-/issues/1727>), but refs are not. Not even when updated via `git update-ref`.\n\n## Detecting corruption\n\nWhen viewing a project's main site returns 5xx errors, it might have been a victim of corruption. To confirm, double check with [this dashboard](https://log.gprd.gitlab.net/goto/5d10a91b65b89df295d089f1bd5f8a52) (internal). If it appears there, it has at least parts of it's refs corrupted.\nAny curruption will only surface here if there is traffic on that project. It might get picked up during housekeeping, but then additional damage is done.\n\n## Before you start\n\nOnce you found the gitaly shard and location of the project on that shard (`/var/opt/gitlab/git-data/repositories/@hashed/*.git`) **`cd` into that directory**.\n\nMake a backup! Usually (once in the repo) `sudo tar cvf ~<your user>/<issue_id>.tar .` is enough.\n\nExample:\n\n```\nsudo tar cvf ~t4cc0re/1234.tar .\n```\n\n- There is no `/` between `~` and the username. This will expand to your user's `$HOME`.\n- The file will be saved as root, but your user should be able to access it regardless.\n\n## Identifying the damage\n\nAny of these commands writing to the repo must be prefixed with `sudo -u git`, or you might corrupt filesystem permissions!\n\n`git fsck` will provide you with an outline of the damage.\n\n```\nChecking object directories: 100% (256/256), done.\nChecking objects: 100% (1206/1206), done.\nerror: refs/keep-around/0123456789abcdef0123456789abcdef01234567: invalid sha1 pointer 0000000000000000000000000000000000000000\nerror: refs/merge-requests/42/merge: invalid sha1 pointer 0000000000000000000000000000000000000000\nerror: refs/pipelines/123456789: invalid sha1 pointer 0000000000000000000000000000000000000000\nerror: refs/tags/v1.1: invalid sha1 pointer 0000000000000000000000000000000000000000\nerror: refs/heads/master: invalid sha1 pointer 0000000000000000000000000000000000000000\ndangling commit 76543210fedcba9876543210fedcba9876543210\n```\n\nNot all of those errors must appear, but this is what you may expect. Anything complaining about an `invalid sha1 pointer` is a corrupted ref. A `dangling commit` can be caused by a corrupt ref, but can also be a leftover. If you see one, this is not immediately alarming.\n\n## Types of refs and how to fix them\n\nLuckily, we have some redundancy in state, so we can manually piece together the state the project should have been in (for the most part).\n\nThe portion on figuring out which hash should be restored follows below, but first how to restore a ref once you know the commit.\n\nTo restore a ref you should first use `git update-ref`.\n\n```bash\nsudo -u git git update-ref refs/keep-around/0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567\n```\n\nIf this fails for some reason, you can update the ref using an editor of your choice run `sudo -u git $EDITOR $REF` and replace all file content with the full commit hash and a trailing newline.\n\nLike this\n\n```bash\nsudo -u git $EDITOR refs/keep-around/0123456789abcdef0123456789abcdef01234567\n```\n\n```\n0123456789abcdef0123456789abcdef01234567\n```\n\n**Important** make sure you copy the **full** commit hash (`0123456789abcdef0123456789abcdef01234567`) in all cases, not the shortened one (`012345678`).\n\n### Check `packed-refs` first\n\nIn most cases, a quick look in `packed-refs` (if it exists) will yield the commit-hash you seek. It should look something like this:\n\n```\n0123456789abcdef0123456789abcdef01234567 refs/heads/master\n0123456789abcdef0123456789abcdef01234567 refs/tags/v1.1\n```\n\n**Note**: These refs are captured at the time of a `git gc` as run in housekeeping. So they might not be up to date or not exist at all. Feel free to use this to restore the primary branch to a known good state, and then continue to look for the most recent commit.\n\n### `refs/heads/*`\n\nThese are user-facing branches of the project. In case of the project's primary branch (such as `main` or `master`), this has to be recreated first for GitLab (and various `git` commands) to function properly.\n\nUnfortunately, this is also the type of ref we have the least redundancy for. Your best bet here is to use the project's activity feed (visit `https://gitlab.com/<namespace>/<project>/activity` via your admin account) to get some info here. Individual links to commits on that page might fail to load, so copy their link which will contain the full hash to the commit.\n\nIn the case of the primary branches it is most important to have the ref pointing to *something* that is in the tree, rather than getting the latest commit (which you might only be able to piece together afterwards). Use your best judgement here to point it to a commit that was definitely on the branch you restore. You can validate this afterwards by running a `git log`. It should print no errors and a continous tree of commits.\n\nBecause git is decentralized, we can ask the customer to re-push those refs afterwards, but only if we did not advance the branch ahead of what it should be. The high turnaround time is also to be considered for this approach.\n\nThe nature of the filesystem corruption around refs is, that those refs are getting updated. So the likelyhood of this corruption appearing near a merge is high. Make sure to check all recently merged merge requests to piece together the most recent state of the branch. If in doubt, talk to the customer and have them double-check.\n\nIf you are unable to find a commit, you can take the nuclear option and force a lookup in all objects to find the root commit (initial commit).\n\nAlternatively, if you saw dangling commits during `git fsck` it is very likely, that one of them is the commit you are looking for. So check it for plausibility with `git show <hash>`\n\n#### Finding root commits with broken refs\n\n**Regardless which approach you take** you might end up with multiple root commits (if there was an orphaned branch created for example). In those cases, you can use `git log <hash>` to see if there are any indicators for the commit belonging to another ref, that was not destroyed.\nOnce you restored the primary branch with the root commit, things will start working again, but you **must** to make an effort to find the latest commit for that branch, once context is available.\n\n##### Approach 1\n\nGit's fsck can probably find the root for us.\n\n```bash\ngit fsck --root\n```\n\n```\nroot 17f4d6097a063c78f16e6a31e41e0e7ba753228e\n[...]\n```\n\n##### Approach 2\n\nIf this fails, there is a good chance we can still reach all commits, so we can probably use `git cat-file` to find it.\n\n```bash\ngit cat-file --batch-all-objects --batch-check | awk '$2~/commit/ {print $1}' | xargs -rn1 git rev-list --max-parents=0 | sort -Vu\n```\n\n##### Approach 3\n\nIf this fails, we need to bypass git.\nTo do this, we need to first unpack any `.pack` files. No data is being lost, we just unpack it, so we can work around git.\n\n```bash\n# git will refuse to unpack anything already present, so we need to move the pack files to a non standard location first.\n# https://git-scm.com/docs/git-unpack-objects\nmv objects/pack pack\n# unpack all packed files (this might take a while)\nfind . -name '*.pack' -type f -exec sh -c 'cat {} | sudo -u git git unpack-objects' \\;\n# find root commit (this might also take a while)\nfind objects/ -type f | tr -d '/' | sed 's/objects//g' | xargs -rn1 git rev-list --max-parents=0 | sort -Vu\n```\n\n### `refs/keep-around/*`\n\nThese refs are the easiest to repair, as they contain what t",
+      "kind": "document"
+    },
+    {
+      "id": "D-d4521cbf2763ce67e2eb",
+      "documentId": "e32777d4-bed2-42ce-bddc-21051c6820a4",
+      "version": "fee712c0-4e5c-42f0-aab5-2bc25582b93f",
+      "sourceFile": "gitlab__docs__gitaly__gitaly-repository-corruption.md",
+      "title": "原文读取",
+      "start": 75,
+      "end": 656,
+      "content": "## Why does this happen?\n\nFor all we know commits and git objects themselves are not lost, but in some cases refs getting updated might result in them getting stored as an empty file.\nIt is likely, that gitaly wants to update the ref, but did not sync the content to disk before having the host fail, so the file containing the ref was corrupted in the process.\n\nObjects are fine (with errors being detectable that is) as they are hashed, and `fsync()`ed by git (<https://gitlab.com/gitlab-org/gitaly/-/issues/1727>), but refs are not. Not even when updated via `git update-ref`.\n\n",
+      "kind": "document"
+    },
+    {
+      "id": "D-29e19fcc95b4bda44a67",
+      "documentId": "e32777d4-bed2-42ce-bddc-21051c6820a4",
+      "version": "fee712c0-4e5c-42f0-aab5-2bc25582b93f",
+      "sourceFile": "gitlab__docs__gitaly__gitaly-repository-corruption.md",
+      "title": "原文读取",
+      "start": 656,
+      "end": 1128,
+      "content": "## Detecting corruption\n\nWhen viewing a project's main site returns 5xx errors, it might have been a victim of corruption. To confirm, double check with [this dashboard](https://log.gprd.gitlab.net/goto/5d10a91b65b89df295d089f1bd5f8a52) (internal). If it appears there, it has at least parts of it's refs corrupted.\nAny curruption will only surface here if there is traffic on that project. It might get picked up during housekeeping, but then additional damage is done.\n\n",
+      "kind": "document"
+    }
+  ],
+  "auditedOutput": "{\n  \"findings\": [\n    {\n      \"text\": \"demo/team-alpha 仓库全部20次HTTP请求返回5xx，日志确认其 refs/heads/master 指向全零SHA1（0000000000000000000000000000000000000000），且主机上次非正常关机（previous_shutdown_clean=false）。\",\n      \"certainty\": \"observation\",\n      \"citations\": [\n        {\n          \"id\": \"A1\",\n          \"quote\": \"impact: demo/team-alpha 仓库页面20次请求均返回5xx，其他仓库探测正常。\"\n        },\n        {\n          \"id\": \"L2\",\n          \"quote\": \"message: repository=demo/team-alpha refs/heads/master: invalid sha1 pointer 0000000000000000000000000000000000000000\"\n        },\n        {\n          \"id\": \"L1\",\n          \"quote\": \"message: host_boot_id=demo-boot-02 previous_shutdown_clean=false\"\n        }\n      ]\n    },\n    {\n      \"text\": \"该损坏符合Gitaly因unclean shutdown导致ref文件未fsync而损坏的典型模式：refs未被fsync，而git对象本身完好。\",\n      \"certainty\": \"supported\",\n      \"citations\": [\n        {\n          \"id\": \"D-d4521cbf2763ce67e2eb\",\n          \"quote\": \"For all we know commits and git objects themselves are not lost, but in some cases refs getting updated might result in them getting stored as an empty file.\\nIt is likely, that gitaly wants to update the ref, but did not sync the content to disk before having the host fail, so the file containing the ref was corrupted in the process.\\n\\nObjects are fine (with errors being detectable that is) as they are hashed, and `fsync()`ed by git (<https://gitlab.com/gitlab-org/gitaly/-/issues/1727>), but refs are not. Not even when updated via `git update-ref`.\"\n        }\n      ]\n    }\n  ],\n  \"actions\": [\n    {\n      \"text\": \"执行 `sudo -u git git fsck` 检查 demo/team-alpha 仓库以识别所有 invalid sha1 pointer 错误。\",\n      \"command\": \"sudo -u git git fsck\",\n      \"prerequisites\": \"需先定位仓库路径（如 `/var/opt/gitlab/git-data/repositories/@hashed/.../.git`）并 `cd` 进入该目录；所有写入仓库的操作必须以 `sudo -u git` 执行，否则可能破坏文件系统权限。\",\n      \"citations\": [\n        {\n          \"id\": \"D-ecede5bebb0136fdc5e2\",\n          \"quote\": \"## Identifying the damage\\n\\nAny of these commands writing to the repo must be prefixed with `sudo -u git`, or you might corrupt filesystem permissions!\\n\\n`git fsck` will provide you with an outline of the damage.\\n\\n```\\nChecking object directories: 100% (256/256), done.\\nChecking objects: 100% (1206/1206), done.\\nerror: refs/keep-around/0123456789abcdef0123456789abcdef01234567: invalid sha1 pointer 0000000000000000000000000000000000000000\\nerror: refs/merge-requests/42/merge: invalid sha1 pointer 0000000000000000000000000000000000000000\\nerror: refs/pipelines/123456789: invalid sha1 pointer 0000000000000000000000000000000000000000\\nerror: refs/tags/v1.1: invalid sha1 pointer 0000000000000000000000000000000000000000\\nerror: refs/heads/master: invalid sha1 pointer 0000000000000000000000000000000000000000\\ndangling commit 76543210fedcba9876543210fedcba9876543210\\n```\"\n        },\n        {\n          \"id\": \"D-ecede5bebb0136fdc5e2\",\n          \"quote\": \"## Before you start\\n\\nOnce you found the gitaly shard and location of the project on that shard (`/var/opt/gitlab/git-data/repositories/@hashed/*.git`) **`cd` into that directory**.\\n\\nMake a backup! Usually (once in the repo) `sudo tar cvf ~<your user>/<issue_id>.tar .` is enough.\"\n        }\n      ]\n    },\n    {\n      \"text\": \"检查 `packed-refs` 文件内容，确认是否存在 `refs/heads/master` 对应的有效SHA1。\",\n      \"command\": \"\",\n      \"prerequisites\": \"注意：`packed-refs` 由 `git gc` 在 housekeeping 时生成，可能过期或不存在；若存在，其格式应为 `0123456789abcdef0123456789abcdef01234567 refs/heads/master`。\",\n      \"citations\": [\n        {\n          \"id\": \"D-ecede5bebb0136fdc5e2\",\n          \"quote\": \"### Check `packed-refs` first\\n\\nIn most cases, a quick look in `packed-refs` (if it exists) will yield the commit-hash you seek. It should look something like this:\\n\\n```\\n0123456789abcdef0123456789abcdef01234567 refs/heads/master\\n0123456789abcdef0123456789abcdef01234567 refs/tags/v1.1\\n```\\n\\n**Note**: These refs are captured at the time of a `git gc` as run in housekeeping. So they might not be up to date or not exist at all. Feel free to use this to restore the primary branch to a known good state, and then continue to look for the most recent commit.\"\n        }\n      ]\n    },\n    {\n      \"text\": \"访问 `https://gitlab.com/demo/team-alpha/activity`（需管理员权限）定位最近提交的完整SHA1，用于恢复 master ref。\",\n      \"command\": \"\",\n      \"prerequisites\": \"需管理员账户访问；页面中个别提交链接可能无法加载，但URL中包含完整SHA1；恢复时须确保 ref 指向树内有效提交，后续可用 `git log` 验证连通性。\",\n      \"citations\": [\n        {\n          \"id\": \"D-ecede5bebb0136fdc5e2\",\n          \"quote\": \"### `refs/heads/*`\\n\\nThese are user-facing branches of the project. In case of the project's primary branch (such as `main` or `master`), this has to be recreated first for GitLab (and various `git` commands) to function properly.\\n\\nUnfortunately, this is also the type of ref we have the least redundancy for. Your best bet here is to use the project's activity feed (visit `https://gitlab.com/<namespace>/<project>/activity` via your admin account) to get some info here. Individual links to commits on that page might fail to load, so copy their link which will contain the full hash to the commit.\\n\\nIn the case of the primary branches it is most important to have the ref pointing to *something* that is in the tree, rather than getting the latest commit (which you might only be able to piece together afterwards). Use your best judgement here to point it to a commit that was definitely on the branch you restore. You can validate this afterwards by running a `git log`. It should print no errors and a continous tree of commits.\"\n        }\n      ]\n    }\n  ],\n  \"missingEvidence\": [\n    \"demo/team-alpha 仓库在 Gitaly shard 上的具体文件路径（如 @hashed 目录）\",\n    \"packed-refs 文件是否存在及实际内容\",\n    \"该仓库 activity 页面中可访问的最新提交哈希\",\n    \"是否存在 dangling commit 及其 `git show` 输出结果\"\n  ]\n}"
+}

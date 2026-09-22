@@ -1,0 +1,114 @@
+{
+  "incident": {
+    "id": "dc108748-7066-4ecd-a9c2-460d80b5ee41",
+    "scenarioId": "error_slo_violation_001",
+    "scenarioName": "错误率 SLO 违反（应用错误率超标）",
+    "symptoms": "分析当前告警，说明已观察的问题、尚未确认的原因及有来源的检查步骤和前提。",
+    "alertsJson": "{\n  \"success\" : true,\n  \"alerts\" : [ {\n    \"severity\" : \"SEV2\",\n    \"service\" : \"sidekiq-main\",\n    \"current_value\" : \"job_error_ratio=8.2%\",\n    \"threshold\" : \"job_error_ratio > 1.5%\",\n    \"instance\" : \"sidekiq-demo-01\",\n    \"environment\" : \"demo\",\n    \"data_source\" : \"synthetic_mock_snapshot\",\n    \"observed_at\" : \"2026-09-10T10:00:00+08:00\",\n    \"impact\" : \"最近5分钟1000个任务中82个失败，队列仍在消费。\",\n    \"alert_name\" : \"ErrorSLOViolation\",\n    \"description\" : \"错误率 SLO 违反（应用错误率超标）；最近5分钟1000个任务中82个失败，队列仍在消费。\",\n    \"state\" : \"firing\",\n    \"active_at\" : \"2026-09-10T09:42:00+08:00\",\n    \"duration\" : \"18m\"\n  } ],\n  \"message\" : \"成功检索到 1 个活动告警\",\n  \"error\" : null\n}",
+    "logsJson": "{\n  \"success\" : true,\n  \"region\" : \"ap-guangzhou\",\n  \"log_topic\" : \"application-logs\",\n  \"query\" : \"DEFAULT_QUERY\",\n  \"logs\" : [ {\n    \"timestamp\" : \"2026-09-10T09:42:00+08:00\",\n    \"level\" : \"ERROR\",\n    \"service\" : \"sidekiq-main\",\n    \"instance\" : \"sidekiq-demo-01\",\n    \"message\" : \"worker=ProjectImportWorker jid=demo-b1 Gitlab::ExclusiveLeaseHelpers::FailedToObtainLockError resource=project:42\",\n    \"metrics\" : { }\n  }, {\n    \"timestamp\" : \"2026-09-10T09:43:00+08:00\",\n    \"level\" : \"WARN\",\n    \"service\" : \"sidekiq-main\",\n    \"instance\" : \"sidekiq-demo-01\",\n    \"message\" : \"worker=ProjectImportWorker jid=demo-b2 retry_count=3 resource=project:42\",\n    \"metrics\" : { }\n  }, {\n    \"timestamp\" : \"2026-09-10T10:00:00+08:00\",\n    \"level\" : \"INFO\",\n    \"service\" : \"sidekiq-main\",\n    \"instance\" : \"sidekiq-demo-01\",\n    \"message\" : \"window=5m jobs=1000 failed_jobs=82 completed_jobs=918\",\n    \"metrics\" : { }\n  } ],\n  \"total\" : 3,\n  \"message\" : \"成功查询到 3 条日志\"\n}",
+    "capturedAt": "2026-09-15T18:20:40.898248589Z"
+  },
+  "evidence": [
+    {
+      "id": "A1",
+      "documentId": "",
+      "version": "dc108748-7066-4ecd-a9c2-460d80b5ee41",
+      "sourceFile": "错误率 SLO 违反（应用错误率超标）",
+      "title": "A1",
+      "start": 0,
+      "end": 416,
+      "content": "severity: SEV2\nservice: sidekiq-main\ncurrent_value: job_error_ratio=8.2%\nthreshold: job_error_ratio > 1.5%\ninstance: sidekiq-demo-01\nenvironment: demo\ndata_source: synthetic_mock_snapshot\nobserved_at: 2026-09-10T10:00:00+08:00\nimpact: 最近5分钟1000个任务中82个失败，队列仍在消费。\nalert_name: ErrorSLOViolation\ndescription: 错误率 SLO 违反（应用错误率超标）；最近5分钟1000个任务中82个失败，队列仍在消费。\nstate: firing\nactive_at: 2026-09-10T09:42:00+08:00\nduration: 18m",
+      "kind": "observation"
+    },
+    {
+      "id": "L1",
+      "documentId": "",
+      "version": "dc108748-7066-4ecd-a9c2-460d80b5ee41",
+      "sourceFile": "错误率 SLO 违反（应用错误率超标）",
+      "title": "L1",
+      "start": 0,
+      "end": 232,
+      "content": "timestamp: 2026-09-10T09:42:00+08:00\nlevel: ERROR\nservice: sidekiq-main\ninstance: sidekiq-demo-01\nmessage: worker=ProjectImportWorker jid=demo-b1 Gitlab::ExclusiveLeaseHelpers::FailedToObtainLockError resource=project:42\nmetrics: {}",
+      "kind": "observation"
+    },
+    {
+      "id": "L2",
+      "documentId": "",
+      "version": "dc108748-7066-4ecd-a9c2-460d80b5ee41",
+      "sourceFile": "错误率 SLO 违反（应用错误率超标）",
+      "title": "L2",
+      "start": 0,
+      "end": 190,
+      "content": "timestamp: 2026-09-10T09:43:00+08:00\nlevel: WARN\nservice: sidekiq-main\ninstance: sidekiq-demo-01\nmessage: worker=ProjectImportWorker jid=demo-b2 retry_count=3 resource=project:42\nmetrics: {}",
+      "kind": "observation"
+    },
+    {
+      "id": "L3",
+      "documentId": "",
+      "version": "dc108748-7066-4ecd-a9c2-460d80b5ee41",
+      "sourceFile": "错误率 SLO 违反（应用错误率超标）",
+      "title": "L3",
+      "start": 0,
+      "end": 171,
+      "content": "timestamp: 2026-09-10T10:00:00+08:00\nlevel: INFO\nservice: sidekiq-main\ninstance: sidekiq-demo-01\nmessage: window=5m jobs=1000 failed_jobs=82 completed_jobs=918\nmetrics: {}",
+      "kind": "observation"
+    },
+    {
+      "id": "D-a5edded7a34e1908acd1",
+      "documentId": "90cfae13-aaaf-4a28-ad06-ad0403b6c540",
+      "version": "90307559-1289-4c0c-baf2-ef2b1ad08716",
+      "sourceFile": "gitlab__docs__alerts__ErrorSLOViolation.md",
+      "title": "ErrorSLOViolation",
+      "start": 0,
+      "end": 19,
+      "content": "# ErrorSLOViolation",
+      "kind": "document"
+    },
+    {
+      "id": "D-55378b2c1ad2cd7a7e44",
+      "documentId": "90cfae13-aaaf-4a28-ad06-ad0403b6c540",
+      "version": "90307559-1289-4c0c-baf2-ef2b1ad08716",
+      "sourceFile": "gitlab__docs__alerts__ErrorSLOViolation.md",
+      "title": "What does this alert mean?",
+      "start": 34,
+      "end": 284,
+      "content": "### What does this alert mean?\n\nAn ErrorSLOViolation occurs when the error rate for a specific application or service exceeds the defined Service Level Objective (SLO) threshold, indicating potential issues impacting functionality or user experience.",
+      "kind": "document"
+    },
+    {
+      "id": "D-916f9317bcbdb9665cab",
+      "documentId": "b5bedb6d-2e0f-42ee-a482-6de1e4d7e853",
+      "version": "8f82896e-7d8d-49fb-af97-561fe9368757",
+      "sourceFile": "gitlab__docs__sidekiq__sidekiq_error_rate_high.md",
+      "title": "Symptoms",
+      "start": 0,
+      "end": 84,
+      "content": "## Symptoms\n\n* An alert in `#alerts-general` for Sidekiq's error ratio exceeding SLO",
+      "kind": "document"
+    },
+    {
+      "id": "D-c5531a16bd8ba1dd9da0",
+      "documentId": "90cfae13-aaaf-4a28-ad06-ad0403b6c540",
+      "version": "90307559-1289-4c0c-baf2-ef2b1ad08716",
+      "sourceFile": "gitlab__docs__alerts__ErrorSLOViolation.md",
+      "title": "原文读取",
+      "start": 34,
+      "end": 286,
+      "content": "### What does this alert mean?\n\nAn ErrorSLOViolation occurs when the error rate for a specific application or service exceeds the defined Service Level Objective (SLO) threshold, indicating potential issues impacting functionality or user experience.\n\n",
+      "kind": "document"
+    },
+    {
+      "id": "D-376cc721df2a11275b0c",
+      "documentId": "90cfae13-aaaf-4a28-ad06-ad0403b6c540",
+      "version": "90307559-1289-4c0c-baf2-ef2b1ad08716",
+      "sourceFile": "gitlab__docs__alerts__ErrorSLOViolation.md",
+      "title": "原文读取",
+      "start": 286,
+      "end": 683,
+      "content": "### Possible Causes\n\nSeveral factors can contribute to these alerts:\n\n- Bugs in the application code causing unexpected behavior.\n- Resource exhaustion (CPU, memory) leading to errors during request processing.\n- External service errors propagating back to the application\n- Underlying infrastructure problems impacting application stability (e.g., database errors, network connectivity issues).\n\n",
+      "kind": "document"
+    }
+  ],
+  "draft": "{\"findings\":[{\"text\":\"Sidekiq 任务错误率超标：最近5分钟1000个任务中82个失败，错误率为8.2%，超过SLO阈值1.5%。\",\"certainty\":\"observation\",\"citations\":[{\"id\":\"A1\",\"quote\":\"current_value: job_error_ratio=8.2%\\nthreshold: job_error_ratio > 1.5%\\nimpact: 最近5分钟1000个任务中82个失败，队列仍在消费。\\ndescription: 错误率 SLO 违反（应用错误率超标）；最近5分钟1000个任务中82个失败，队列仍在消费。\"}]},{\"text\":\"ProjectImportWorker 因无法获取排他锁（Gitlab::ExclusiveLeaseHelpers::FailedToObtainLockError）在 project:42 上失败，是已观测到的具体错误根源。\",\"certainty\":\"observation\",\"citations\":[{\"id\":\"L1\",\"quote\":\"message: worker=ProjectImportWorker jid=demo-b1 Gitlab::ExclusiveLeaseHelpers::FailedToObtainLockError resource=project:42\"}]},{\"text\":\"同一资源 project:42 上的 ProjectImportWorker 任务已重试3次仍失败，表明锁竞争或资源阻塞可能持续存在，待验证是否为错误率升高的主因。\",\"certainty\":\"hypothesis\",\"citations\":[{\"id\":\"L2\",\"quote\":\"message: worker=ProjectImportWorker jid=demo-b2 retry_count=3 resource=project:42\"},{\"id\":\"D-376cc721df2a11275b0c\",\"quote\":\"- Bugs in the application code causing unexpected behavior.\\n- Resource exhaustion (CPU, memory) leading to errors during request processing.\\n- External service errors propagating back to the application\\n- Underlying infrastructure problems impacting application stability (e.g., database errors, network connectivity issues).\"}]}],\"contradictions\":[],\"actions\":[{\"text\":\"检查 project:42 是否正被其他进程长时间持有排他锁，确认锁竞争是否真实存在\",\"command\":\"\",\"prerequisites\":\"\",\"citations\":[{\"id\":\"D-376cc721df2a11275b0c\",\"quote\":\"Several factors can contribute to these alerts:\\n\\n- Bugs in the application code causing unexpected behavior.\\n- Resource exhaustion (CPU, memory) leading to errors during request processing.\\n- External service errors propagating back to the application\\n- Underlying infrastructure problems impacting application stability (e.g., database errors, network connectivity issues).\"}]}],\"missingEvidence\":[\"project:42 当前锁状态（如 lease key 是否被占用、过期时间、持有者）\",\"sidekiq-demo-01 实例的 CPU / 内存 / 数据库连接等资源使用率快照\",\"是否存在其他 worker 同时操作 project:42 的日志证据\"],\"service\":\"sidekiq-main\",\"relevant\":true}",
+  "auditedOutput": "{\n  \"findings\": [\n    {\n      \"index\": 0,\n      \"text\": \"Sidekiq 任务错误率超标：最近5分钟1000个任务中82个失败，错误率为8.2%，超过SLO阈值1.5%。\",\n      \"certainty\": \"observation\",\n      \"evidence\": [\"A1\"]\n    },\n    {\n      \"index\": 1,\n      \"text\": \"ProjectImportWorker 在 project:42 上报告 Gitlab::ExclusiveLeaseHelpers::FailedToObtainLockError 错误\",\n      \"certainty\": \"observation\",\n      \"evidence\": [\"L1\"]\n    },\n    {\n      \"index\": 2,\n      \"text\": \"同一资源 project:42 上的 ProjectImportWorker 任务重试3次仍失败，可能由锁竞争导致，待验证是否为错误率升高的主因\",\n      \"certainty\": \"hypothesis\",\n      \"evidence\": [\"L2\", \"D-376cc721df2a11275b0c\"]\n    }\n  ],\n  \"contradictions\": [],\n  \"actions\": [\n    {\n      \"index\": 0,\n      \"supported\": false,\n      \"evidenceId\": \"D-376cc721df2a11275b0c\",\n      \"supportingQuote\": \"\",\n      \"reason\": \"原文仅列出'底层基础设施问题'等泛化可能原因，未指定'检查 project:42 锁状态'的具体操作、对象或前提；缺少对锁检查路径、工具或权限的直接支持\"\n    }\n  ],\n  \"missingEvidence\": [\n    \"project:42 当前锁状态（如 lease key 占用情况）\",\n    \"sidekiq-demo-01 实例资源使用率快照\",\n    \"其他 worker 操作 project:42 的日志证据\"\n  ]\n}"
+}

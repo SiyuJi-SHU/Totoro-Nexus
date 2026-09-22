@@ -1,0 +1,339 @@
+[
+  {
+    "scenario_id": "apdex_slo_violation_001",
+    "alert": {
+      "alert_name": "ApdexSLOViolation",
+      "description": "This alert indicates that the Apdex score for a specific service has fallen below a predefined threshold, signifying a potential performance degradation.",
+      "severity": "severity::2",
+      "service": "",
+      "duration": "",
+      "current_value": "",
+      "threshold": "0.8"
+    },
+    "related_logs": [],
+    "expected_docs": [
+      "opensource/gitlab__docs__alerts__ApdexSLOViolation.md"
+    ],
+    "expected_root_cause": "Database connection issues, slow queries or database performance issues.",
+    "expected_actions": [
+      "Review Apdex score details, response times, error rates, and any anomalies.",
+      "Review logs for errors, timeouts, or slow queries related to the affected services. Look for correlations between log entries and performance issues.",
+      "Check for recent deployments, configuration changes, or infrastructure modifications."
+    ]
+  },
+  {
+    "scenario_id": "error_slo_violation_001",
+    "alert": {
+      "alert_name": "ErrorSLOViolation",
+      "description": "An ErrorSLOViolation occurs when the error rate for a specific application or service exceeds the defined Service Level Objective (SLO) threshold, indicating potential issues impacting functionality or user experience.",
+      "severity": "severity::2",
+      "service": "sidekiq service",
+      "duration": "",
+      "current_value": "",
+      "threshold": "1.5%"
+    },
+    "related_logs": [
+      {
+        "timestamp": "",
+        "level": "",
+        "service": "sidekiq service",
+        "message": "Gitlab::ExclusiveLeaseHelpers::FailedToObtainLockError"
+      }
+    ],
+    "expected_docs": [
+      "opensource/gitlab__docs__alerts__ErrorSLOViolation.md"
+    ],
+    "expected_root_cause": "Bugs in the application code causing unexpected behavior.",
+    "expected_actions": [
+      "Investigate application error logs to identify the specific errors occurring.",
+      "Analyze the timestamps and frequency of errors to pinpoint potential root causes",
+      "Correlate error messages with recent code deployments or infrastructure changes."
+    ]
+  },
+  {
+    "scenario_id": "traffic_absent_001",
+    "alert": {
+      "alert_name": "TrafficAbsent",
+      "description": "This lack of traffic suggests that the service is not functioning as intended, which can lead to disruptions in dependent systems and user functionalities.",
+      "severity": "severity::2",
+      "service": "Sidekiq",
+      "duration": "30m",
+      "current_value": "zero",
+      "threshold": "5 jobs per minute"
+    },
+    "related_logs": [],
+    "expected_docs": [
+      "opensource/gitlab__docs__alerts__TrafficAbsent.md"
+    ],
+    "expected_root_cause": "The service might be down or unresponsive.",
+    "expected_actions": [
+      "Check the status of the service and its dependencies using the dashboard links",
+      "Look for errors or unusual activity in the Kibana.",
+      "Check Request Per Second(RPS) trend on the service to see if it is a spikey traffic problem or maybe it doesn't get any traffic"
+    ]
+  },
+  {
+    "scenario_id": "blackbox_probe_failures_001",
+    "alert": {
+      "alert_name": "BlackboxProbeFailures",
+      "description": "The alert BlackboxProbeFailures is designed to notify you when the success rate of probes executed by the Blackbox exporter falls below 75% for 10 minutes.",
+      "severity": "Sev4 to Sev1",
+      "service": "Blackbox Exporter Service",
+      "duration": "10m",
+      "current_value": "",
+      "threshold": "75%"
+    },
+    "related_logs": [],
+    "expected_docs": [
+      "opensource/gitlab__docs__blackbox__alerts__BlackboxProbeFailures.md"
+    ],
+    "expected_root_cause": "A variety of factors can cause a probe to fail: a GCP outage, Cloudflare event, expired SSL certificate, or a breaking change.",
+    "expected_actions": [
+      "The recipient is supposed to check if the endpoint is reachable; if not, check for logs and try to figure out the cause of a endpoint being unreachable, and then fix it or escalate it.",
+      "ssh blackbox-01-inf-gprd.c.gitlab-production.internal -L 9115:localhost:9115",
+      "Please note that the exporter will only keep up to 1000 results, and drop older ones."
+    ]
+  },
+  {
+    "scenario_id": "cloud_sql_database_down_001",
+    "alert": {
+      "alert_name": "CloudSQLDatabaseDown",
+      "description": "This alert means that the Cloud SQL database for the environment is unavailable. Any services using the Cloud SQL database that is down are most likely to be degraded or unavailable as well.",
+      "severity": "",
+      "service": "Cloud SQL Service",
+      "duration": "5m",
+      "current_value": "0",
+      "threshold": "1"
+    },
+    "related_logs": [],
+    "expected_docs": [
+      "opensource/gitlab__docs__cloud-sql__alerts__CloudSQLDatabaseDown.md"
+    ],
+    "expected_root_cause": "It is more likely to notify the EoC due to a configuration change, or maintenance work conducted by our own teams.",
+    "expected_actions": [
+      "Try to identify from the alert expression which database is unavailable.",
+      "Examine the service to verify if it is working or showing problems. This may help rule out false positive alerts.",
+      "Log into the Google Cloud web console and find the Cloud SQL database and look for health information."
+    ]
+  },
+  {
+    "scenario_id": "gitaly_repository_corruption_001",
+    "alert": {
+      "alert_name": "Restoring gitaly data corruption on a project after an unclean shutdown",
+      "description": "When viewing a project's main site returns 5xx errors, it might have been a victim of corruption.",
+      "severity": "",
+      "service": "gitaly",
+      "duration": "",
+      "current_value": "",
+      "threshold": ""
+    },
+    "related_logs": [
+      {
+        "timestamp": "",
+        "level": "error",
+        "service": "git",
+        "message": "error: refs/keep-around/0123456789abcdef0123456789abcdef01234567: invalid sha1 pointer 0000000000000000000000000000000000000000"
+      },
+      {
+        "timestamp": "",
+        "level": "error",
+        "service": "git",
+        "message": "error: refs/heads/master: invalid sha1 pointer 0000000000000000000000000000000000000000"
+      }
+    ],
+    "expected_docs": [
+      "opensource/gitlab__docs__gitaly__gitaly-repository-corruption.md"
+    ],
+    "expected_root_cause": "It is likely, that gitaly wants to update the ref, but did not sync the content to disk before having the host fail, so the file containing the ref was corrupted in the process.",
+    "expected_actions": [
+      "Make a backup!",
+      "git fsck will provide you with an outline of the damage.",
+      "sudo -u git git update-ref refs/keep-around/0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef01234567"
+    ]
+  },
+  {
+    "scenario_id": "elk_mapper_parsing_exception_001",
+    "alert": {
+      "alert_name": "mapper_parsing_exception",
+      "description": "You see messages like the following on a pubsubbeat log:",
+      "severity": "",
+      "service": "pubsubbeat",
+      "duration": "",
+      "current_value": "",
+      "threshold": ""
+    },
+    "related_logs": [
+      {
+        "timestamp": "",
+        "level": "WARN",
+        "service": "pubsubbeat",
+        "message": "WARN    elasticsearch/client.go:502    Cannot index event publisher.Event{Content:beat.Event{[A BUNCH OF EVENT DATA]} (status=400): {\"type\":\"mapper_parsing_exception\",\"reason\":\"object mapping for [json.peer.address] tried to parse field [peer.address] as object, but found a concrete value\"}"
+      }
+    ],
+    "expected_docs": [
+      "opensource/gitlab__docs__elastic__troubleshooting__elk_mapper_parsing_exception.md"
+    ],
+    "expected_root_cause": "Most likely, this is caused by a format change in a component's log output.",
+    "expected_actions": [
+      "the following day's index should create the mapping matching the new log structure and logging should resume working correctly.",
+      "override the index name on the appropriate pubsub node's /opt/pubsubbeat/pubsubbeat.yml",
+      "You should rollback that change afterwards."
+    ]
+  },
+  {
+    "scenario_id": "kube_containers_waiting_in_error_001",
+    "alert": {
+      "alert_name": "KubeContainersWaitingInError",
+      "description": "More than 50% of the containers waiting to start for a Deployment are in an error state — any reason other than ContainerCreating. Existing running containers are unaffected; the risk is that they may be terminated while replacements cannot start.",
+      "severity": "",
+      "service": "Kubernetes Service Overview",
+      "duration": "",
+      "current_value": "",
+      "threshold": "50%"
+    },
+    "related_logs": [],
+    "expected_docs": [
+      "opensource/gitlab__docs__kube__alerts__KubeContainersWaitingInError.md"
+    ],
+    "expected_root_cause": "A configuration error rolled out to the app, producing CrashLoopBackOff on startup.",
+    "expected_actions": [
+      "glsh kube use-cluster <env>",
+      "kubectl get pods -A --field-selector=status.phase=Pending",
+      "kubectl logs -n <namespace> <pod> [--previous]"
+    ]
+  },
+  {
+    "scenario_id": "patroni_deadlocks_detected_001",
+    "alert": {
+      "alert_name": "PatroniDeadlocksDetected",
+      "description": "This alert fires when PostgreSQL reports a sustained, elevated number of deadlocks on the node named in the alert (`{{ $labels.type }}` / `{{ $labels.fqdn }}`) — this can be the primary or a replica.",
+      "severity": "severity::4",
+      "service": "Patroni Service",
+      "duration": "10m",
+      "current_value": "",
+      "threshold": "5 deadlocks / 5 min"
+    },
+    "related_logs": [
+      {
+        "timestamp": "",
+        "level": "ERROR",
+        "service": "PostgreSQL",
+        "message": "ERROR:  deadlock detected\nDETAIL: Process 123 waits for ShareLock on transaction 456; blocked by process 789.\n        Process 789 waits for ShareLock on transaction 654; blocked by process 123.\n        Process 123: UPDATE ...\n        Process 789: UPDATE ...\nCONTEXT: while updating tuple (x,y) in relation \"some_table\""
+      }
+    ],
+    "expected_docs": [
+      "opensource/gitlab__docs__patroni__alerts__PatroniDeadlocksDetected.md"
+    ],
+    "expected_root_cause": "two code paths taking row locks in opposite order, or long / idle-in-transaction sessions holding locks",
+    "expected_actions": [
+      "Correct inconsistent lock ordering between two code paths so they acquire locks in the same order.",
+      "Shorten or split large transactions (often a Sidekiq job) that hold locks too long.",
+      "Eliminate idle in transaction sessions that hold locks."
+    ]
+  },
+  {
+    "scenario_id": "postgres_data_corruption_001",
+    "alert": {
+      "alert_name": "Dealing with Data Corruption in PostgreSQL",
+      "description": "Data corruption in PostgreSQL is a very unlilely, but possible scenario.",
+      "severity": "",
+      "service": "PostgreSQL",
+      "duration": "",
+      "current_value": "",
+      "threshold": ""
+    },
+    "related_logs": [
+      {
+        "timestamp": "",
+        "level": "",
+        "service": "PostgreSQL",
+        "message": "could not read block ZZZZ in file \"base/16401/33909\": read only 0 of NNNN bytes"
+      },
+      {
+        "timestamp": "",
+        "level": "WARNING",
+        "service": "PostgreSQL",
+        "message": "WARNING: page verification failed, calculated checksum 726 but expected 827"
+      },
+      {
+        "timestamp": "",
+        "level": "ERROR",
+        "service": "PostgreSQL",
+        "message": "ERROR: invalid page in block 0 of relation base/16401/33909"
+      }
+    ],
+    "expected_docs": [
+      "opensource/gitlab__docs__patroni__postgres-data-corruption.md"
+    ],
+    "expected_root_cause": "Faulty Disks",
+    "expected_actions": [
+      "REINDEX CONCURRENTLY",
+      "Re-create the index.",
+      "Contact DBRE and OnGres for support"
+    ]
+  },
+  {
+    "scenario_id": "postgresql_disk_space_001",
+    "alert": {
+      "alert_name": "PostgreSQL",
+      "description": "So your Postgres server has run out of disk space",
+      "severity": "",
+      "service": "Postgres",
+      "duration": "",
+      "current_value": "",
+      "threshold": ""
+    },
+    "related_logs": [
+      {
+        "timestamp": "2018-01-29 10:13:01 GMT",
+        "level": "LOG",
+        "service": "postgresql",
+        "message": "2018-01-29_10:13:01.21015 postgres02 postgresql: 2018-01-29 10:13:01 GMT [91066]: [1-1] LOG:  started streaming WAL from primary at 2B44/23000000 on timeline 4"
+      },
+      {
+        "timestamp": "2018-01-29 10:13:01 GMT",
+        "level": "FATAL",
+        "service": "postgresql",
+        "message": "2018-01-29_10:13:01.21047 postgres02 postgresql: 2018-01-29 10:13:01 GMT [91066]: [2-1] FATAL:  could not receive data from WAL stream: ERROR:  requested WAL segment 0000000400002B4400000023 has already been removed"
+      }
+    ],
+    "expected_docs": [
+      "opensource/gitlab__docs__patroni__postgresql-disk-space.md"
+    ],
+    "expected_root_cause": "If there's a replication slot that has active false and has a markedly old restart_lsn then it may be forcing Postgres to keep lots of old xlog around.",
+    "expected_actions": [
+      "tail /var/log/gitlab/postgresql/current",
+      "select * from pg_replication_slots",
+      "du -sh /var/opt/gitlab/postgresql/data/pg_xlog"
+    ]
+  },
+  {
+    "scenario_id": "sidekiq_error_rate_high_001",
+    "alert": {
+      "alert_name": "Sidekiq's error ratio exceeding SLO",
+      "description": "An alert in #alerts-general for Sidekiq's error ratio exceeding SLO",
+      "severity": "",
+      "service": "Sidekiq",
+      "duration": "",
+      "current_value": "",
+      "threshold": "SLO"
+    },
+    "related_logs": [
+      {
+        "timestamp": "",
+        "level": "",
+        "service": "ReactiveCachingWorker",
+        "message": "Errno::EHOSTUNREACHSidekiq/ReactiveCachingWorker\nFailed to open TCP connection to 192.0.2.188:8089 (No route to host -connect(2)..."
+      }
+    ],
+    "expected_docs": [
+      "opensource/gitlab__docs__sidekiq__sidekiq_error_rate_high.md"
+    ],
+    "expected_root_cause": "Should this be incorrect, or if their Bamboo server is down, the integration might fail.",
+    "expected_actions": [
+      "Perform a search for ReactiveCachingWorker and see if there might be any recent errors",
+      "In this case, we'll use our administrative power to disable this integration",
+      "Finally, reach out to support letting them know your findings, the decision into what led disabling this integration, and ask that they reach out to the end user"
+    ]
+  }
+]

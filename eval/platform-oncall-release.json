@@ -1,0 +1,71 @@
+[
+  {
+    "id": "material-conversation",
+    "turns": [
+      {
+        "question": "hello",
+        "expectedKind": "chat_reply",
+        "expectedStatus": "completed"
+      },
+      {
+        "question": "请分析故障",
+        "diagnose": true,
+        "expectedKind": "clarification",
+        "expectedStatus": "completed"
+      },
+      {
+        "question": "分析这些日志，区分观察和待验证原因，给出有来源的检查。",
+        "diagnose": true,
+        "incidentText": "2026-09-17 10:00 service=gitlab-web alert=ApdexSLOViolation Apdex=0.62 threshold=0.8; requests=1000 slow_requests=310 http_5xx=12. WARN database query latency increased.",
+        "expectedKind": "incident_report",
+        "requiredEvidence": [
+          "0.62"
+        ],
+        "expectedSources": [
+          "gitlab__docs__alerts__ApdexSLOViolation.md"
+        ]
+      },
+      {
+        "question": "新增反证后重新判断调查方向，不要把先前假设当成事实。",
+        "diagnose": true,
+        "incidentText": "2026-09-17 10:15 service=gitlab-web Apdex=0.61; database query p99=2ms; lock_waits=0; application CPU=99%; request queue delay=900ms. Database metrics recovered but user latency remains high.",
+        "expectedKind": "incident_report",
+        "requiredEvidence": [
+          "99%"
+        ],
+        "forbiddenText": [
+          "已确认根因",
+          "已排除数据库故障"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "knowledge",
+    "question": "Apdex是什么？不用诊断，解释文档中的定义。",
+    "expectedKind": "knowledge_answer",
+    "requiredEvidence": [
+      "Apdex"
+    ],
+    "expectedSources": [
+      "gitlab__docs__alerts__ApdexSLOViolation.md"
+    ],
+    "referenceAnswer": "应根据Runbook解释Apdex衡量响应时间满意度，区分满意、可容忍、令人沮丧；不得把资料中的示例当作当前事故。"
+  },
+  {
+    "id": "error-slo-regression",
+    "question": "分析当前错误率告警，给出有来源的检查，不要把其他worker的示例操作套用到本次。",
+    "scenarioId": "error_slo_violation_001",
+    "expectedKind": "incident_report",
+    "expectedSources": [
+      "gitlab__docs__alerts__ErrorSLOViolation.md"
+    ],
+    "requiredTools": [
+      "incident.read"
+    ],
+    "forbiddenText": [
+      "已确认根因",
+      "已执行修复"
+    ]
+  }
+]
