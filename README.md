@@ -29,6 +29,8 @@ Java 17 · Spring Boot · Spring AI · PostgreSQL · Milvus · Lucene BM25 · �
 
 在本项目目录双击 **`启动平台.cmd`**。它检查 Docker 和本地服务、打开页面，并启动或复用已配置的 ngrok 外链；外链连接失败时本地平台仍可使用。
 
+启动结束后窗口会显示本项目容器状态并保留，按任意键关闭即可；关闭窗口不停止后台服务或外链。核心服务应显示 `healthy`，guard 无健康探针，正常状态为 `Up`；外链以脚本中的 `Public access verified` 提示为准。
+
 - [聊天前台](http://localhost:9900/) · [管理 Console](http://localhost:9900/console.html)
 - 已有账号、Agent、知识库和历史继续沿用。日常启动无需重新构建、复制配置模板或导入数据。
 - 演示期间保持电脑唤醒、Docker 与网络在线；Console 需要管理员角色，公网与本地共用同一套数据。
