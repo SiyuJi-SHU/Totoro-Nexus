@@ -1,5 +1,15 @@
 # 验收状态
 
+## 发布收束 · 2026-09-23
+
+- [公开仓库](https://github.com/SiyuJi-SHU/Totoro-Nexus)、[v1.0.0 源码发布](https://github.com/SiyuJi-SHU/Totoro-Nexus/releases/tag/v1.0.0) 均已上线；发布提交为 `03f394f7ff675b05e290585b18f6ba300b81022a`。
+- [该提交的 GitHub CI](https://github.com/SiyuJi-SHU/Totoro-Nexus/actions/runs/35820408351) 已通过。297 项 Java 测试中 6 项真实外部测试跳过；24 项前端测试通过，0 失败、0 错误。
+- 源码 ZIP 为 2,730,138 字节，SHA256：`2e718a9b7c385a9e1735b6e510d1433eaf73eabeeb63cfeb247de283bd682d66`。包含源码、测试、部署说明与公开示例，不含私有配置、备份、运行数据或构建产物。
+- 只读检查时，应用、PostgreSQL、Milvus、etcd、MinIO 五个核心容器均 healthy；公网 gateway healthy，guard 运行中。本地健康接口为 `UP`，公网和本地构建均为 `c72c13bfb1730c3aa861438dc1f2103eef3387e3e956c718b3ca80b475629384`。
+- 统一使用当前 `Totoro-Nexus` 目录及 `启动平台.cmd`。后续 `main` 文档修订不改变 `v1.0.0` 标签、Agent 链路或已保存的数据。本次收尾没有新增模型调用、重跑付费评测或重启容器。
+
+这表示当前功能基线已完成发布与文档收束，不表示模型回答永远正确、外链永久在线或达到生产高可用；实际功能验收范围与已知限制如下。
+
 ## 功能基线
 
 本次目录整理以 2026-09-22 已部署并由用户测试的 a494a7bdbbc69d009f56e9fc44cf94c7ae0bd88e865afc371a81d07b6e21e57a 为基线。业务 Java 和前端文件逐一按字节核对，没有借迁移重写 Agent、RAG 或回答策略。

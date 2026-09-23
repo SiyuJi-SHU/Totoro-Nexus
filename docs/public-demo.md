@@ -2,7 +2,7 @@
 
 当前使用 [ngrok 演示入口](ngrok-demo.md)。`scripts/start-platform.ps1` 和根目录 `启动平台.cmd` 已改为 ngrok，不再按下文启动 OpenFrp。以下仅保留历史排障记录。
 
-## 当前状态
+## 当时状态（2026-09-22）
 
 域名接入暂时搁置：xpdns 公开页的四个后缀均为 disabled，已登录页面也无法选择。认证成功不代表域名可申请。另已连通无需账号的 localhost.run 临时隧道，实测较慢，仍非正式方案，见 [免费外链试验](public-access-trial.md)。
 

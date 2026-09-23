@@ -51,7 +51,7 @@ Copy-Item .env.example .env
 
 当前 Windows 本机使用 `启动平台.cmd` 即可，等价于 `./scripts/start-platform.ps1`：沿用现有最终镜像启动本地项目，并自动连接已配置的外链。仅需本地服务的开发命令仍为 `./scripts/start.ps1 -SkipBuild`。从 Maven 直接运行时，上传目录默认 `runtime/uploads`，评测目录默认 `eval`，数据库和 Milvus 连接需由环境变量配置。
 
-仅克隆 GitHub 源码不会获得当前六个 Agent、账号或对话。全新安装在 Console 创建配置并导入示例；迁移原有业务需同时恢复数据库、文件和私有配置。
+仅克隆 GitHub 源码不会获得已有 Agent 配置、账号或对话。全新安装在 Console 创建配置并导入示例；迁移原有业务需同时恢复数据库、文件和私有配置。
 
 ## 开发验证
 
@@ -101,6 +101,8 @@ Windows 启动入口会先运行 `scripts/ensure-docker-desktop.ps1`。它仅处
 
 ## 公网入口
 
-本次不重新选择公网供应商。已有网关配置及辅助脚本统一位于 `deploy/public-demo/`，可用 `./deploy/public-demo/share-demo.ps1 -Action Prepare` 准备本地 9902 入口，不会开启公网隧道。
+当前采用 [ngrok 固定演示入口](ngrok-demo.md)，日常由 `启动平台.cmd` 自动连接。网关配置及辅助脚本统一位于 `deploy/public-demo/`；手动执行 `./deploy/public-demo/share-demo.ps1 -Action Prepare` 只准备本地 9902 网关，不会开启公网隧道。
 
-已有 OpenFrp、ngrok 与临时入口各自的接入状态见对应文档。公网验收必须另行核对可信 HTTPS、管理路由隔离、普通账号、SSE、附件和外网速度，不能以本机登录页 200 代替。
+`totoro-nexus-prod` 运行应用和存储，`totoro-nexus-demo` 运行 gateway / guard；两组共用同一套应用和数据。公网允许访问 Console，但由应用的 ADMIN / MEMBER 角色控制操作权限，普通体验账号不获得管理权限。
+
+OpenFrp 与 localhost.run 文档只保留历史试验记录，不是当前启动步骤。已有公网验收范围见 ngrok 文档；异地网络速度和长时间稳定性不能由本机登录页或健康检查保证。
