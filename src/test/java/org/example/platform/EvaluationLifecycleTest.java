@@ -152,7 +152,40 @@ class EvaluationLifecycleTest {
             assertThat(retrieval.latestJob().id()).isEqualTo("baseline");
             var oldBuild=json.valueToTree(result);((com.fasterxml.jackson.databind.node.ObjectNode)oldBuild).put("sourceHash","older-build");
             db.update("UPDATE evaluation_jobs SET result_json=?",catalog.encode(oldBuild));
-            assertThat(evaluation.workspaces().stream().filter(w->w.knowledgeBase().id().equals("existing-knowledge")).findFirst().orElseThrow().retrieval().state()).isEqualTo("stale");
+            assertThat(evaluation.workspaces().get(0).retrieval().state()).isEqualTo("current");
+            ((com.fasterxml.jackson.databind.node.ObjectNode)oldBuild).remove("sourceHash");
+            db.update("UPDATE evaluation_jobs SET result_json=?",catalog.encode(oldBuild));
+            assertThat(evaluation.workspaces().get(0).retrieval().state()).isEqualTo("current");
+            assertThat(evaluation.workspaces().get(0).retrieval().latestJob().id()).isEqualTo("baseline");
+            for(String changed:List.of("sourceVersions","caseManifest","model","pipelineVersion")) {
+                var altered=(com.fasterxml.jackson.databind.node.ObjectNode)oldBuild.deepCopy();
+                if(changed.equals("sourceVersions"))altered.putArray(changed).addObject().put("documentId","changed").put("version","v2");
+                else if(changed.equals("caseManifest"))((com.fasterxml.jackson.databind.node.ObjectNode)altered.path(changed).path("cases").get(0)).put("question","different question");
+                else altered.put(changed,"changed-version");
+                db.update("UPDATE evaluation_jobs SET result_json=?",catalog.encode(altered));
+                assertThat(evaluation.workspaces().get(0).retrieval().state()).as(changed).isEqualTo("stale");
+            }
+        }finally{evaluation.close();}
+    }
+
+    @Test void agentBaselineWithoutBuildHashStillExpiresWhenAgentVersionChanges()throws Exception {
+        var ds=new DriverManagerDataSource("jdbc:h2:mem:"+UUID.randomUUID()+";MODE=PostgreSQL;DB_CLOSE_DELAY=-1","sa","");
+        new ResourceDatabasePopulator(new ClassPathResource("db/migration/V1__platform_catalog.sql"),new ClassPathResource("db/migration/V5__session_origin.sql"),new ClassPathResource("db/migration/V6__agent_drafts.sql"),new ClassPathResource("db/migration/V7__evaluation_suite_targets.sql")).execute(ds);
+        var db=new JdbcTemplate(ds);var catalog=new PlatformCatalog(db,json);catalog.initializeDefaults();
+        var search=mock(KnowledgeSearch.class);when(search.scope(anyList())).thenReturn(new KnowledgeSearch.Scope(List.of("existing-knowledge"),Set.of(),List.of()));
+        var models=mock(ChatModelFactory.class);when(models.modelName()).thenReturn("mock");
+        var evaluation=new PlatformEvaluation(db,catalog,json,search,mock(AgentRuntime.class),new AgentRunStore(db,catalog),models);
+        try {
+            var agent=catalog.agent("oncall",null);
+            var suite=evaluation.importSuite("Agent baseline","agent",json.readTree("[{\"question\":\"hello\",\"expectedKind\":\"chat_reply\"}]"),"existing-knowledge",agent.id(),agent.config().strategy());
+            var config=new PlatformEvaluation.Config(List.of("existing-knowledge"),"hybrid",10,3,true,agent.id(),agent.version());
+            var result=Map.of("sourceVersions",List.of(),"caseManifest",suite,"model","mock","pipelineVersion","rag-v2","summary",Map.of());
+            db.update("INSERT INTO evaluation_jobs(id,set_id,config_json,status,result_json) VALUES(?,?,?,'completed',?)","baseline",suite.id(),catalog.encode(config),catalog.encode(result));
+            assertThat(evaluation.workspaces().get(0).agents().get(0).state()).isEqualTo("current");
+            var changed=(com.fasterxml.jackson.databind.node.ObjectNode)json.valueToTree(agent.config());
+            changed.put("instructions","changed instructions");
+            catalog.saveAgent(agent.id(),json.treeToValue(changed,PlatformModels.AgentConfig.class));
+            assertThat(evaluation.workspaces().get(0).agents().get(0).state()).isEqualTo("stale");
         }finally{evaluation.close();}
     }
 

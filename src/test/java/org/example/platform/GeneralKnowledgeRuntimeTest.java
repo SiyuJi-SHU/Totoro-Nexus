@@ -21,6 +21,7 @@ class GeneralKnowledgeRuntimeTest {
         final ObjectMapper json=new ObjectMapper();
         final ChatModelFactory models=mock(ChatModelFactory.class);
         final KnowledgeSearch search=mock(KnowledgeSearch.class);
+        final SessionAttachmentService attachments=mock(SessionAttachmentService.class);
         final PlatformCatalog catalog;
         final AgentRunStore runs;
         final AgentToolRegistry registry;
@@ -41,7 +42,7 @@ class GeneralKnowledgeRuntimeTest {
             when(search.search(any(),anyString(),anyString(),anyInt(),anyInt(),anyBoolean())).thenReturn(new KnowledgeSearch.SearchResult("q","hybrid","no_results",false,List.of(),0,List.of(),List.of(),0,0,0,1));
             var mcp=mock(McpConnections.class);when(mcp.list()).thenReturn(List.of());
             registry=new AgentToolRegistry(catalog,search,mcp,json);
-            var attachments=mock(SessionAttachmentService.class);when(attachments.list(anyString(),anyString())).thenReturn(List.of());
+            when(attachments.list(anyString(),anyString())).thenReturn(List.of());
             runtime=new AgentRuntime(catalog,runs,search,registry,models,new AgentAnswerService(json,new DiagnosticReportService()),mock(AiOpsService.class),json,attachments);
         }
         String draft(String text){return catalog.encode(Map.of("answerText",text,"citations",List.of(),"missingEvidence",List.of()));}

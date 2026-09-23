@@ -5,6 +5,7 @@ import org.example.service.*;
 import org.springframework.ai.chat.messages.*;
 import org.springframework.ai.chat.prompt.Prompt;
 import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatOptions;
+import com.alibaba.cloud.ai.dashscope.api.DashScopeResponseFormat;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.*;
@@ -55,10 +56,19 @@ final class AgentExecution {
         check.run();var options=DashScopeChatOptions.builder().withModel(models.modelName()).withTemperature(config.temperature()).withMaxToken(config.maxOutputTokens()).build();
         options.setInternalToolExecutionEnabled(false);options.setParallelToolCalls(allowTools);options.setEnableThinking(false);
         options.setToolChoice(allowTools?"required":Map.of("type","function","function",Map.of("name",AnswerSubmission.NAME)));
-        var available=new ArrayList<AgentToolRegistry.Tool>(allowTools?availableTools():List.of());available.add(AnswerSubmission.tool(context.answerPolicy,report,context.generalAllowed));options.setToolCallbacks(registry.callbacks(available));
+        // Keep tool selection separate from JSON mode: JSON mode can turn a tool
+        // request into ordinary text. Final attachment answers need no tool call.
+        boolean jsonAnswer=!context.materials.isEmpty()&&!allowTools;
+        if(!context.materials.isEmpty())options.setToolChoice(allowTools?"auto":null);
+        if(jsonAnswer){
+            options.setResponseFormat(new DashScopeResponseFormat(DashScopeResponseFormat.Type.JSON_OBJECT));
+        }
+        var submission=AnswerSubmission.tool(context.answerPolicy,report,context.generalAllowed);
+        var available=new ArrayList<AgentToolRegistry.Tool>(allowTools?availableTools():List.of());if(!jsonAnswer)available.add(submission);options.setToolCallbacks(registry.callbacks(available));
         var current=new ArrayList<Message>(messages);
-        current.add(new SystemMessage("本次剩余工具调用次数："+Math.max(0,config.maxToolCalls()-calls.get())+"。已有信息足够回答就单独submit_answer，不为用完预算继续读取。"+
+        current.add(new SystemMessage("本次剩余工具调用次数："+Math.max(0,config.maxToolCalls()-calls.get())+"。"+(jsonAnswer?"调查已结束，本轮直接输出答案JSON，不调用submit_answer或其他工具。":"已有信息足够回答就单独submit_answer，不为用完预算继续读取。")+
                 (context.answerPolicy==AnswerPolicy.GROUNDED?"提交前核对每条结论全部受到该条所选引文支持。":"根据实际工具结果完成用户要求；目录等元数据无需补读正文或伪造引用。")));
+        if(jsonAnswer)current.add(new SystemMessage("本轮输出必须符合以下JSON Schema，直接输出对象，不包裹name、arguments、function或tool_calls；保留原来的来源要求，未知内容如实说明：\n"+encode(submission.schema())));
         var response=models.response(models.create(config.temperature(),config.maxOutputTokens(),.9),allowTools?"react-step":"answer-synthesis",new Prompt(current,options));
         check.run();return response.getResult().getOutput();
     }
@@ -67,7 +77,7 @@ final class AgentExecution {
         // No model can infer source absence from an interrupted investigation with no evidence.
         if(!complete&&context.evidence.isEmpty()&&!context.generalAllowed&&(context.answerPolicy==AnswerPolicy.GROUNDED||!hasToolResults))
             return encode(AnswerSubmission.missing(context.answerPolicy,"本次调查未完成，尚未取得可用结果；不能据此判断知识库没有相关内容。停止原因见执行记录。"));
-        messages.add(new UserMessage("调查结束。只单独调用submit_answer；未完成的部分列入missingEvidence。"));
+        messages.add(new UserMessage(context.materials.isEmpty()?"调查结束。只单独调用submit_answer；未完成的部分列入missingEvidence。":"调查结束。只输出完整答案JSON；未完成的部分列入missingEvidence。"));
         AssistantMessage output;
         // The request deadline already reserves time for synthesis. There is no second
         // answer-rewriting model call, so synthesis may use the full remaining budget.

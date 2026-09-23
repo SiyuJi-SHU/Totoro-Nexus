@@ -14,7 +14,7 @@ class PlatformClient:
         self.opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(http.cookiejar.CookieJar()))
         self.csrf = None
         if password is None:
-            password = os.getenv("PLATFORM_ADMIN_PASSWORD") or Path("uploads/.platform/admin-initial-password.txt").read_text().strip()
+            password = os.getenv("PLATFORM_ADMIN_PASSWORD") or (Path(__file__).resolve().parents[1] / 'runtime/uploads/.platform/admin-initial-password.txt').read_text().strip()
         self.csrf = self.call("GET", "/api/auth/csrf")
         body = urllib.parse.urlencode({"username": username, "password": password}).encode()
         self.call("POST", "/api/auth/login", body, "application/x-www-form-urlencoded")

@@ -119,7 +119,9 @@ class AgentRuntimeTest {
             verify(models,never()).streamText(any(),eq("answer-audit"),anyString(),anyString(),any());
         }finally{runtime.close();}
     }
-    @Test void explicitAttachmentRequestCannotClarifyAndReadsTheUploadedFile()throws Exception {
+    @org.junit.jupiter.params.ParameterizedTest
+    @org.junit.jupiter.params.provider.ValueSource(strings={"看看这个文件","读一下发你的东西"})
+    void attachmentRequestReadsTheUploadedFile(String question)throws Exception {
         var data=new DriverManagerDataSource("jdbc:h2:mem:"+UUID.randomUUID()+";MODE=PostgreSQL;DB_CLOSE_DELAY=-1","sa","");
         new ResourceDatabasePopulator(new ClassPathResource("db/migration/V1__platform_catalog.sql"),
                 new ClassPathResource("db/migration/V4__session_attachments.sql"),new ClassPathResource("db/migration/V5__session_origin.sql")).execute(data);
@@ -131,7 +133,13 @@ class AgentRuntimeTest {
                 new org.springframework.jdbc.datasource.DataSourceTransactionManager(data),new org.springframework.transaction.annotation.AnnotationTransactionAttributeSource()));
         var runs=(AgentRunStore)proxy.getProxy();var search=mock(KnowledgeSearch.class);var models=mock(ChatModelFactory.class);var mcp=mock(McpConnections.class);
         when(models.modelName()).thenReturn("qwen-plus");
-        when(models.call(any(),eq("task-routing"),anyString(),anyString())).thenReturn("{\"task\":\"CLARIFICATION_NEEDED\",\"basis\":\"SOURCED\"}");
+        when(models.call(any(),eq("task-routing"),anyString(),anyString())).thenAnswer(call->{
+            var request=json.readTree((String)call.getArgument(3));
+            assertThat(request.path("materials").get(0).path("filename").asText()).isEqualTo("resume.txt");
+            assertThat(request.toString()).doesNotContain("ATTACHMENT-7329");
+            return question.equals("看看这个文件")?"{\"task\":\"CLARIFICATION_NEEDED\",\"basis\":\"SOURCED\"}":
+                    "{\"task\":\"KNOWLEDGE_QUESTION\",\"basis\":\"SOURCED\"}";
+        });
         when(mcp.list()).thenReturn(List.of());when(search.scope(anyList())).thenReturn(new KnowledgeSearch.Scope(List.of("existing-knowledge"),Set.of("existing-data"),List.of()));
         when(search.contextWindows(any(),anyList())).thenAnswer(inv->{List<PlatformChunk> hits=inv.getArgument(1);return hits.stream().map(c->new AgentToolRegistry.Evidence(c.id(),c.documentId(),c.version(),c.sourceFile(),c.title(),c.start(),c.end(),c.content(),"document")).toList();});
         String attachmentId="attachment-1",content="候选人项目唯一标记 ATTACHMENT-7329；硕士时间为 2024.09 - 2027.06。";
@@ -139,11 +147,15 @@ class AgentRuntimeTest {
         var attachmentService=mock(SessionAttachmentService.class);when(attachmentService.list(anyString(),eq("alice"))).thenReturn(List.of(attachment));when(attachmentService.readContent(attachmentId,"alice")).thenReturn(content);
         String evidenceId="U-"+KnowledgeFiles.digest(attachmentId+KnowledgeFiles.digest(content)+0+content.length()).substring(0,20);
         String answer=catalog.encode(Map.of("answerText","附件包含唯一标记 ATTACHMENT-7329，硕士时间为2024-2027年。","citations",List.of(Map.of("id",evidenceId,"quote",content)),"missingEvidence",List.of()));
-        when(models.response(any(),eq("react-step"),any(Prompt.class))).thenReturn(tool("1","submit_answer",answer));
+        when(models.response(any(),eq("react-step"),any(Prompt.class))).thenAnswer(call->{
+            Prompt prompt=call.getArgument(2);
+            return prompt.getInstructions().toString().contains("ATTACHMENT-7329")?tool("1","submit_answer",answer):
+                    tool("read","read_material","{\"materialId\":\"attachment-1\"}");
+        });
         var registry=new AgentToolRegistry(catalog,search,mcp,json);
         var runtime=new AgentRuntime(catalog,runs,search,registry,models,new AgentAnswerService(json,new DiagnosticReportService()),mock(AiOpsService.class),json,attachmentService);
         try {
-            var run=runtime.start("alice",new AgentRuntime.Input("oncall",null,"看看这个文件",null,false));
+            var run=runtime.start("alice",new AgentRuntime.Input("oncall",null,question,null,false));
             long deadline=System.nanoTime()+java.util.concurrent.TimeUnit.SECONDS.toNanos(8);
             while(AgentRunStore.active(run.status())&&System.nanoTime()<deadline){Thread.sleep(20);run=runs.get(run.id());}
             var result=catalog.decode(run.resultJson(),AgentRuntime.Result.class);

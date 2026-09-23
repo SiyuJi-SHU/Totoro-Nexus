@@ -101,7 +101,9 @@ public class PlatformEvaluation {
         JsonNode previousManifest=result.path("caseManifest");
         boolean sameSuite=json.valueToTree(suite.cases()).equals(previousManifest.has("cases")?previousManifest.path("cases"):previousManifest);
         boolean sameModel=Objects.equals(agent==null?models.modelName():AgentModels.resolve(agent.config(),models.modelName()),result.path("model").asText());
-        if(!sameSources||!sameSuite||!desiredConfig(job,kb,agent)||!sameModel||!sameBuild(result)||!result.path("pipelineVersion").asText().equals("rag-v2"))return "stale";
+        // Workspace validity follows the evaluated configuration and pipeline contract.
+        // Whole-repository hashes also change for UI/tests; retain them for provenance and strict retry merging.
+        if(!sameSources||!sameSuite||!desiredConfig(job,kb,agent)||!sameModel||!result.path("pipelineVersion").asText().equals("rag-v2"))return "stale";
         return job.status().equals("partial")?"attention":"current";
     }
     private static boolean desiredConfig(Job job,PlatformModels.KnowledgeBase kb,PlatformModels.Agent agent) {
@@ -111,7 +113,7 @@ public class PlatformEvaluation {
     }
     private static String stateReason(String state) {return switch(state) {
         case "unconfigured"->"尚未建立 Case";case "unevaluated"->"Case 已就绪，尚未运行";case "running"->"正在运行";
-        case "current"->"当前版本有效";case "attention"->"当前版本已完成，部分 Case 需检查";case "stale"->"程序、资料、Case 或配置版本不一致，请重新运行";
+        case "current"->"与当前评测配置、资料和 Case 一致";case "attention"->"当前配置的评测部分完成，部分 Case 需检查";case "stale"->"评测流程、资料、Case、模型或配置版本不一致，请重新运行";
         case "cancelled"->"上次运行已取消";case "failed"->"上次运行失败";default->state;
     };}
     public Suite importSuite(String name,String kind,JsonNode input) {

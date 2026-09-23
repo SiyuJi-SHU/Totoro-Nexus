@@ -23,7 +23,7 @@ services:
       ETCD_QUOTA_BACKEND_BYTES: "4294967296"
       ETCD_SNAPSHOT_COUNT: "50000"
     volumes:
-      - ${DOCKER_VOLUME_DIRECTORY:-.}/volumes/etcd:/etcd
+      - ${DOCKER_VOLUME_DIRECTORY:-./runtime}/volumes/etcd:/etcd
     command: etcd -advertise-client-urls=http://etcd:2379 -listen-client-urls http://0.0.0.0:2379 --data-dir /etcd
     healthcheck:
       test: ["CMD", "etcdctl", "endpoint", "health"]
@@ -38,7 +38,7 @@ services:
       MINIO_ACCESS_KEY: minioadmin
       MINIO_SECRET_KEY: minioadmin
     volumes:
-      - ${DOCKER_VOLUME_DIRECTORY:-.}/volumes/minio:/minio_data
+      - ${DOCKER_VOLUME_DIRECTORY:-./runtime}/volumes/minio:/minio_data
     command: minio server /minio_data --console-address ":9001"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
@@ -56,7 +56,7 @@ services:
       ETCD_ENDPOINTS: etcd:2379
       MINIO_ADDRESS: minio:9000
     volumes:
-      - ${DOCKER_VOLUME_DIRECTORY:-.}/volumes/milvus:/var/lib/milvus
+      - ${DOCKER_VOLUME_DIRECTORY:-./runtime}/volumes/milvus:/var/lib/milvus
     depends_on:
       etcd:
         condition: service_healthy
@@ -105,11 +105,11 @@ services:
       PLATFORM_DB_USER: agent_platform
       PLATFORM_DB_PASSWORD: ${PLATFORM_DB_PASSWORD:-local-development-only}
       PLATFORM_ADMIN_PASSWORD: ${PLATFORM_ADMIN_PASSWORD:-}
-      DASHSCOPE_API_KEY: ${DASHSCOPE_API_KEY:?Set DASHSCOPE_API_KEY or use start.ps1 -CredentialsCsv}
+      DASHSCOPE_API_KEY: ${DASHSCOPE_API_KEY:?Set DASHSCOPE_API_KEY or use scripts/start.ps1 -CredentialsCsv}
       DASHSCOPE_WORKSPACE_ID: ${DASHSCOPE_WORKSPACE_ID:-}
       DASHSCOPE_RERANK_ENDPOINT: ${DASHSCOPE_RERANK_ENDPOINT:-}
     volumes:
-      - ./uploads:/app/uploads
+      - ./runtime/uploads:/app/uploads
       - ./eval:/app/eval:ro
     depends_on:
       standalone:
@@ -126,3 +126,4 @@ services:
 
 volumes:
   platform-db-data:
+    name: ${PLATFORM_DB_VOLUME:-totoro-nexus-prod_platform-db-data}

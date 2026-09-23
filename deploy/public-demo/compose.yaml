@@ -1,30 +1,47 @@
-name: totoro-nexus
-
+name: totoro-nexus-demo
 services:
-  tailscale:
-    image: tailscale/tailscale:v1.102.4
+  gateway:
+    image: caddy:2-alpine@sha256:de23def33b17fb5d1290b0f6c2add1d70780e52341896c00a4c8a2a2fe9d355e
     restart: unless-stopped
-    entrypoint: ["tailscaled"]
-    command: ["--state=/var/lib/tailscale/tailscaled.state", "--statedir=/var/lib/tailscale", "--tun=userspace-networking"]
     environment:
-      HTTPS_PROXY: ${DEMO_HTTPS_PROXY:-}
-      HTTP_PROXY: ${DEMO_HTTPS_PROXY:-}
-      NO_PROXY: localhost,127.0.0.1,host.docker.internal
+      DEMO_HOSTNAME: ${DEMO_HOSTNAME:-}
+    ports:
+      - "127.0.0.1:9902:8080"
     volumes:
-      - tailscale-state:/var/lib/tailscale
+      - ./${CADDY_CONFIG:-Caddyfile.local}:/etc/caddy/Caddyfile:ro
+      - ./routes.caddy:/etc/caddy/routes.caddy:ro
+      - gateway-data:/data
+      - gateway-config:/config
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      guard:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1:8080/login.html"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+
+  guard:
+    image: nginx:1.28-alpine
+    restart: unless-stopped
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
     extra_hosts:
       - "host.docker.internal:host-gateway"
 
-  gateway:
-    image: nginx:1.28-alpine
+  openfrp:
+    profiles: ["tunnel"]
+    image: totoro-nexus-openfrp:0.68.0-37f78258
+    pull_policy: never
     restart: unless-stopped
-    network_mode: service:tailscale
+    network_mode: service:gateway
+    command: ["-u", "${OPENFRP_TOKEN:-}", "-p", "${OPENFRP_TUNNEL_ID:-}"]
     depends_on:
-      - tailscale
-    volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      gateway:
+        condition: service_healthy
 
 volumes:
-  tailscale-state:
-    external: true
-    name: totoro-nexus_tailscale-state
+  gateway-data:
+  gateway-config:

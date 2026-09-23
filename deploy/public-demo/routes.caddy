@@ -1,0 +1,31 @@
+# Expose the complete application, including Console. The application's own
+# authentication, ADMIN/MEMBER authorization and CSRF checks apply to all routes.
+
+# Compress text assets and JSON, but never buffer or compress SSE events.
+encode gzip {
+    match {
+        header Content-Type text/html*
+        header Content-Type text/css*
+        header Content-Type application/javascript*
+        header Content-Type text/javascript*
+        header Content-Type application/json*
+        header Content-Type image/svg+xml*
+    }
+}
+
+# Filenames are not content-hashed: revalidate after application updates.
+# API and authentication responses retain their private cache policy.
+@static path *.css *.js
+handle @static {
+    reverse_proxy guard:8080 {
+        header_down Cache-Control "public, max-age=0, must-revalidate"
+        header_down -Pragma
+        header_down -Expires
+    }
+}
+
+handle {
+    reverse_proxy guard:8080 {
+        flush_interval -1
+    }
+}

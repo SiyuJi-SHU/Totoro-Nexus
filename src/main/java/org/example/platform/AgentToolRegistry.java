@@ -64,7 +64,7 @@ public class AgentToolRegistry {
         Map<String,Object> schema=new LinkedHashMap<>(tool.schema());schema.put("required",List.of("documentId","version","offset"));return schema;
     }
     public Object execute(Tool tool,JsonNode input,Context c) throws Exception {
-        validateInput(tool,input);
+        validateInput(json.valueToTree(tool.schema()),input);
         String searchMode=tool.id().equals("knowledge.search")?searchMode(input,c):null;
         String key=tool.id()+":"+catalog.encode(json.convertValue(input,TreeMap.class))+(searchMode==null?"":":mode="+searchMode);
         boolean cacheable=!tool.id().equals("system.current_time");
@@ -197,9 +197,8 @@ public class AgentToolRegistry {
         for(String id:context.scope.knowledgeBaseIds())configured.add(catalog.knowledgeBase(id).retrievalMode());
         return configured.size()==1?configured.iterator().next():"hybrid";
     }
-    private void validateInput(Tool tool,JsonNode input) {
+    static void validateInput(JsonNode schema,JsonNode input) {
         if(input==null||!input.isObject())throw PlatformCatalog.bad("工具参数须是JSON对象");
-        var schema=json.valueToTree(tool.schema());
         for(var required:schema.path("required"))if(!input.hasNonNull(required.asText()))throw PlatformCatalog.bad("工具缺少参数: "+required.asText());
         var names=input.fieldNames();
         while(names.hasNext()) {

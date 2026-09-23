@@ -15,7 +15,7 @@ final class ReActExecutor implements AgentExecution.Executor {
             for(int turn=0;turn<e.config.maxToolCalls()+1&&!e.exhausted();turn++) {
                 e.check.run();e.context.emit.accept("stage",Map.of("name","reasoning","message","分析问题并选择下一步工具","toolCalls",e.calls.get(),"toolBudget",e.config.maxToolCalls()));
                 var output=e.generate(true);
-                if(!output.hasToolCalls())return output.getText();
+                if(!output.hasToolCalls())return e.context.materials.isEmpty()?output.getText():e.finish();
                 if(output.getToolCalls().size()==1&&AnswerSubmission.NAME.equals(output.getToolCalls().get(0).name()))return output.getToolCalls().get(0).arguments();
                 e.messages.add(output);List<ToolResponseMessage.ToolResponse> responses=new ArrayList<>();boolean progressed=false;
                 for(var call:output.getToolCalls()){

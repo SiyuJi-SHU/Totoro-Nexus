@@ -101,6 +101,7 @@ final class PlannedExecution {
                 当前仅执行current这一步，选择一个允许工具与参数，不评审计划、不生成新计划。
                 返回 {"action":"execute","tool":"tools.name中的名称","arguments":{}}。
                 根据observations中真实返回的ID、版本、位置填参数，不猜测未来结果。已有文档ID时直接读原文或目录。
+                arguments只能包含所选工具parameters允许的字段。来源中的version等元数据不是所有工具通用的参数，不把read_document参数传给search_document_text。
                 短文档优先一次读取全文：使用真实documentId/version，offset=0、maxChars=20000且不指定sectionId。
                 长文档按已返回的章节或nextOffset读取未覆盖内容，避免反复读取相互包含的章节。
                 注意remainingToolCalls和currentAttemptsRemaining，只针对尚未解决的证据缺口调用工具。
@@ -153,6 +154,10 @@ final class PlannedExecution {
                 }
                 else if(purpose.equals("plan-execute")){
                     if(!action.equals("clarify")&&(!action.equals("execute")||!node.path("arguments").isObject()||tools.stream().noneMatch(t->t.name().equals(node.path("tool").asText()))))throw new IllegalArgumentException();
+                    if(action.equals("execute")){
+                        var selected=tools.stream().filter(t->t.name().equals(node.path("tool").asText())).findFirst().orElseThrow();
+                        AgentToolRegistry.validateInput(json.valueToTree(selected.schema()),node.path("arguments"));
+                    }
                 }else {if(!Set.of("continue","revise","finish","clarify").contains(action)||!node.path("stepComplete").isBoolean())throw new IllegalArgumentException();
                     if(action.equals("continue")&&node.path("stepComplete").asBoolean()&&remaining.isEmpty()) {
                         ((com.fasterxml.jackson.databind.node.ObjectNode)node).put("action","finish");
@@ -162,6 +167,7 @@ final class PlannedExecution {
                     if(action.equals("revise")){Set<String> completed=new HashSet<>();plan.stream().filter(s->s.get("status").equals("completed")).forEach(s->completed.add((String)s.get("id")));if(current!=null&&node.path("stepComplete").asBoolean())completed.add(current.id());parse(node,completed);}}
                 return node;
             }catch(Exception invalid){
+                if(invalid instanceof org.springframework.web.server.ResponseStatusException parameterError)data.put("parameterCorrection",parameterError.getReason()+"；按所选工具parameters修正，不消耗工具调用次数。");
                 data.put("formatCorrection","上次返回不符合当前阶段。phase="+purpose+"；"+(purpose.equals("plan-observe")?"必须含stepComplete布尔值。当前目标若完成，remainingAfterCurrent为空时不能continue：证据足够就finish，否则revise或clarify；当前目标尚未完成可以continue加stepComplete=false。不输出工具调用。":purpose.equals("plan-execute")?"只能返回execute加tool/arguments，或clarify。":"action必须plan，steps必须含id、goal和dependsOn数组。"));
             }
         }

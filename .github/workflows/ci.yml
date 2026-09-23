@@ -1,0 +1,30 @@
+name: Verify
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      RUN_PHASE20_LIVE: "0"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: maven
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Java tests (no live model calls)
+        run: mvn -B -Doncall.live=false test
+      - name: Frontend tests
+        run: node --test src/test/js/*.test.js scripts/workbench-contract.test.cjs

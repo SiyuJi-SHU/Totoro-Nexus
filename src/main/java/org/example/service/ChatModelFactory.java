@@ -37,6 +37,7 @@ public class ChatModelFactory {
     private static final int MAX_RUN_SECONDS = 300;
     private static final java.net.http.HttpClient HTTP=java.net.http.HttpClient.newBuilder()
             .connectTimeout(Duration.ofSeconds(8)).build();
+    private static final com.fasterxml.jackson.databind.ObjectMapper STREAM_JSON=new com.fasterxml.jackson.databind.ObjectMapper();
     private final String apiKey;
     private final String model;
     private final ObservationRegistry observations;
@@ -67,9 +68,16 @@ public class ChatModelFactory {
                 CallTiming timing=context.getOrDefault(CallTiming.class,null);
                 if(timing==null)return response;
                 timing.httpStatus=response.statusCode().value();
-                return response.mutate().body(body->body.doOnNext(bytes->{
+                var observed=response.mutate().body(body->body.doOnNext(bytes->{
                     if(bytes.readableByteCount()>0)timing.received(bytes.readableByteCount());
                 })).build();
+                if(!response.headers().contentType().map(org.springframework.http.MediaType.TEXT_EVENT_STREAM::isCompatibleWith).orElse(false))return observed;
+                // The SDK buffers function arguments until TOOL_CALLS or HTTP EOF.
+                // DashScope also returns STOP. End on the actual terminal SSE record,
+                // preserving it, so the SDK flushes without waiting for the socket to close.
+                return observed.mutate().body(ignored->observed.bodyToFlux(String.class).takeUntil(timing::terminalEvent)
+                        .map(data->org.springframework.core.io.buffer.DefaultDataBufferFactory.sharedInstance.wrap(
+                                ("data: "+data.replace("\n","\ndata: ")+"\n\n").getBytes(java.nio.charset.StandardCharsets.UTF_8)))).build();
             })));
         return DashScopeApi.builder().apiKey(apiKey).restClientBuilder(org.springframework.web.client.RestClient.builder().requestFactory(transport))
                 .webClientBuilder(web).build();
@@ -132,7 +140,8 @@ public class ChatModelFactory {
             boolean noResponse=last==0&&now-timing.start>=TimeUnit.SECONDS.toNanos(30);
             if(idle||noResponse||expired(now,phaseDeadline,runDeadline,last)){
                 timing.failureKind=idle?"upstream_idle":noResponse?"upstream_first_response_timeout":"local_deadline";
-                sink.error(new ModelDeadline.LimitException());
+                sink.error(idle?new ModelDeadline.LimitException("上游模型连续10秒未返回新数据，本次回答未完成"):
+                        noResponse?new ModelDeadline.LimitException("等待上游模型首包超过30秒，本次回答未完成"):new ModelDeadline.LimitException());
             }
         });
         var complete=new AtomicReference<ChatResponse>();
@@ -146,6 +155,7 @@ public class ChatModelFactory {
             throw new IllegalStateException("模型流未完整结束");
         return response;
     }
+    private static boolean terminalReason(String reason){return reason!=null&&!reason.isBlank()&&!"null".equalsIgnoreCase(reason);}
     // Keep the hard run limit. Only an actively arriving response may cross the
     // investigation cutoff. Detect a stalled response immediately, without waiting
     // for the investigation cutoff; completed fragments are never invented from partial JSON.
@@ -165,16 +175,28 @@ public class ChatModelFactory {
         final String callId=UUID.randomUUID().toString(),purpose,model;
         final long start;final AtomicLong firstByte=new AtomicLong(),lastByte=new AtomicLong(),byteCount=new AtomicLong(),chunks=new AtomicLong();
         final java.util.function.BiConsumer<String,Object> events=UsageLedger.events();
-        volatile Integer httpStatus;String failureKind,requestId;
+        volatile Integer httpStatus;String failureKind,requestId,finishReason;
         CallTiming(String purpose,String model,long start){this.purpose=purpose;this.model=model;this.start=start;
             events.accept("model_start",Map.of("callId",callId,"purpose",purpose,"model",model,"startedAt",java.time.Instant.now().toString()));}
         void received(int bytes){long now=System.nanoTime();lastByte.set(now);byteCount.addAndGet(bytes);chunks.incrementAndGet();if(firstByte.compareAndSet(0,now))
             events.accept("model_response",Map.of("callId",callId,"firstResponseMs",(now-start)/1_000_000));}
+        boolean terminalEvent(String data){
+            if("[DONE]".equals(data.strip()))return true;
+            try {
+                var event=STREAM_JSON.readTree(data);
+                for(var choice:event.path("output").path("choices")){
+                    String reason=choice.path("finish_reason").asText("");
+                    if(terminalReason(reason)){finishReason=reason;requestId=event.path("request_id").asText(null);return true;}
+                }
+            }catch(com.fasterxml.jackson.core.JsonProcessingException ignored){/* The SDK reports malformed provider data. */}
+            return false;
+        }
         Map<String,Object> details(){var result=new LinkedHashMap<String,Object>();result.put("callId",callId);
             if(firstByte.get()!=0)result.put("firstResponseMs",(firstByte.get()-start)/1_000_000);
             if(lastByte.get()!=0){result.put("lastResponseMs",(lastByte.get()-start)/1_000_000);result.put("responseBytes",byteCount.get());result.put("responseChunks",chunks.get());}
             if(httpStatus!=null)result.put("httpStatus",httpStatus);
             if(requestId!=null&&!requestId.isBlank())result.put("requestId",requestId);
+            if(terminalReason(finishReason))result.put("finishReason",finishReason);
             if(failureKind!=null)result.put("failureKind",failureKind);
             return result;}
     }

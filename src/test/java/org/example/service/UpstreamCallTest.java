@@ -20,6 +20,49 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 class UpstreamCallTest {
+    @org.junit.jupiter.params.ParameterizedTest
+    @org.junit.jupiter.params.provider.ValueSource(strings={"stop","tool_calls"})
+    void longToolAnswerDrainsEveryFragmentBeforeTheTerminalRecord(String finishReason)throws Exception {
+        var json=new ObjectMapper();
+        String answer=json.writeValueAsString(Map.of("answerText","附件中的人物行动与来源。".repeat(350),"citations",List.of(),"missingEvidence",List.of()));
+        var server=HttpServer.create(new InetSocketAddress("127.0.0.1",0),0);
+        var releaseConnection=new java.util.concurrent.CountDownLatch(1);
+        var sent=new java.util.concurrent.atomic.AtomicInteger();
+        server.createContext("/",exchange->{
+            exchange.getRequestBody().readAllBytes();
+            exchange.getResponseHeaders().add("Content-Type","text/event-stream");exchange.sendResponseHeaders(200,0);
+            try {
+                for(int offset=0;offset<=answer.length();offset+=4){
+                    boolean terminal=offset+4>answer.length();
+                    var function=new LinkedHashMap<String,Object>();if(offset==0)function.put("name","submit_answer");
+                    function.put("arguments",answer.substring(offset,Math.min(offset+4,answer.length())));
+                    var tool=new LinkedHashMap<String,Object>();tool.put("index",0);tool.put("function",function);
+                    if(offset==0){tool.put("id","tool-long");tool.put("type","function");}
+                    var choice=Map.of("finish_reason",terminal?finishReason:"null","message",Map.of("role","assistant","content","","tool_calls",List.of(tool)));
+                    var chunk=Map.of("request_id","req-long","output",Map.of("choices",List.of(choice)),"usage",Map.of("input_tokens",3000,"output_tokens",terminal?2000:0,"total_tokens",terminal?5000:3000));
+                    exchange.getResponseBody().write(("data: "+json.writeValueAsString(chunk)+"\n\n").getBytes(StandardCharsets.UTF_8));
+                    exchange.getResponseBody().flush();sent.incrementAndGet();
+                    Thread.sleep(1);
+                }
+                releaseConnection.await(12,TimeUnit.SECONDS);
+            }catch(InterruptedException interrupted){Thread.currentThread().interrupt();}
+            finally{exchange.close();}
+        });server.start();
+        try {
+            var factory=new ChatModelFactory("test-key","deepseek-v4-flash",ObservationRegistry.NOOP,new SimpleMeterRegistry());
+            var api=factory.api().mutate().baseUrl("http://127.0.0.1:"+server.getAddress().getPort()).build();
+            var options=DashScopeChatOptions.builder().withModel("deepseek-v4-flash").build();
+            options.setInternalToolExecutionEnabled(false);
+            var client=DashScopeChatModel.builder().dashScopeApi(api).defaultOptions(options).build();
+            try(var deadline=ModelDeadline.bind(System.nanoTime()+TimeUnit.SECONDS.toNanos(10))){
+                var result=factory.response(client,"answer-synthesis",new Prompt("根据附件回答"));
+                assertThat(sent.get()).isGreaterThan(1000);
+                assertThat(result.getResult().getOutput().getToolCalls()).singleElement().satisfies(t->assertThat(t.arguments()).isEqualTo(answer));
+                assertThat(result.getMetadata().getUsage().getTotalTokens()).isEqualTo(5000);
+            }
+        }finally{releaseConnection.countDown();server.stop(0);}
+    }
+
     @Test void silentProviderIsCancelledAndMarkedAsLocalDeadline()throws Exception {
         var factory=new ChatModelFactory("test-key","deepseek-v4-flash",ObservationRegistry.NOOP,new SimpleMeterRegistry());
         var ledger=mock(UsageLedger.class);ReflectionTestUtils.setField(factory,"ledger",ledger);
@@ -65,16 +108,19 @@ class UpstreamCallTest {
         }));
         long start=System.nanoTime();
         try(var deadline=ModelDeadline.bind(start+TimeUnit.SECONDS.toNanos(60))){
-            assertThatThrownBy(()->factory.response(client,"react-step",new Prompt("test"))).isInstanceOf(ModelDeadline.LimitException.class);
+            assertThatThrownBy(()->factory.response(client,"react-step",new Prompt("test"))).isInstanceOf(ModelDeadline.LimitException.class).hasMessageContaining("上游模型连续10秒未返回新数据");
         }
         assertThat(System.nanoTime()-start).isLessThan(TimeUnit.SECONDS.toNanos(3));
         assertThat(cancelled.await(1,TimeUnit.SECONDS)).isTrue();
         verify(ledger).record(eq("react-step"),eq("chat"),anyString(),isNull(),isNull(),isNull(),anyLong(),eq("failed"),argThat(t->"upstream_idle".equals(t.get("failureKind"))));
     }
 
-    @Test void sdkAssemblesToolArgumentsAndPreservesUsageAndWireOptions()throws Exception {
+    @org.junit.jupiter.params.ParameterizedTest
+    @org.junit.jupiter.params.provider.ValueSource(strings={"stop","tool_calls"})
+    void sdkAssemblesToolArgumentsAndPreservesUsageAndWireOptions(String finishReason)throws Exception {
         var json=new ObjectMapper();var wire=new AtomicReference<com.fasterxml.jackson.databind.JsonNode>();
         var server=HttpServer.create(new InetSocketAddress("127.0.0.1",0),0);
+        var releaseConnection=new java.util.concurrent.CountDownLatch(1);
         String answer="{\"answerText\":\"智慧与归乡意志\",\"citations\":[],\"missingEvidence\":[]}";
         server.createContext("/",exchange->{
             wire.set(json.readTree(exchange.getRequestBody()));
@@ -84,11 +130,13 @@ class UpstreamCallTest {
                 function.put("arguments",i==0?answer.substring(0,12):i==1?answer.substring(12):"");
                 var tool=new LinkedHashMap<String,Object>();tool.put("index",0);tool.put("function",function);
                 if(i==0){tool.put("id","tool-1");tool.put("type","function");}
-                var choice=Map.of("finish_reason",i==2?"stop":"null","message",Map.of("role","assistant","content","","tool_calls",List.of(tool)));
+                var choice=Map.of("finish_reason",i==2?finishReason:"null","message",Map.of("role","assistant","content","","tool_calls",List.of(tool)));
                 var chunk=Map.of("request_id","req-test","output",Map.of("choices",List.of(choice)),"usage",Map.of("input_tokens",30,"output_tokens",i==2?20:0,"total_tokens",i==2?50:30));
                 exchange.getResponseBody().write(("data: "+json.writeValueAsString(chunk)+"\n\n").getBytes(StandardCharsets.UTF_8));exchange.getResponseBody().flush();
             }
-            exchange.close();
+            // A completed model response must not wait for HTTP EOF.
+            try{releaseConnection.await(8,TimeUnit.SECONDS);}catch(InterruptedException interrupted){Thread.currentThread().interrupt();}
+            finally{exchange.close();}
         });server.start();
         try {
             var factory=new ChatModelFactory("test-key","deepseek-v4-flash",ObservationRegistry.NOOP,new SimpleMeterRegistry());
@@ -109,6 +157,6 @@ class UpstreamCallTest {
             assertThat(params.path("max_tokens").asInt()).isEqualTo(4000);
             assertThat(params.path("tool_choice").asText()).isEqualTo("required");
             verify(ledger).record(eq("react-step"),eq("chat"),eq("deepseek-v4-flash"),eq(30),eq(20),eq(50),anyLong(),eq("success"),argThat(t->t.containsKey("firstResponseMs")&&t.get("httpStatus").equals(200)));
-        }finally{server.stop(0);}
+        }finally{releaseConnection.countDown();server.stop(0);}
     }
 }

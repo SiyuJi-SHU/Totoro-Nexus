@@ -1,64 +1,88 @@
 # Totoro Nexus
 
-一个可配置的知识 Agent 与运维分析工作台。Console 管配置、资料和评测，前台用于对话；同一套权限、证据、预算和运行记录支持 ReAct、Plan–Execute–Replan、Workflow 三种执行模式。
+一个可配置的知识 Agent 与运维分析平台，包含聊天前台、管理 Console 和评测工作台。
 
-这是个人项目与面试演示，不是经过生产规模验证的企业服务。Workflow 只读分析用户提供的告警/日志，不会执行生产修复命令。
+Java 17 · Spring Boot · Spring AI · PostgreSQL · Milvus · Lucene BM25 · 阿里云百炼 · Docker Compose
 
 <!-- public-demo-status:start -->
-面试演示 URL：[https://totoronexus.tail8c1da2.ts.net/](https://totoronexus.tail8c1da2.ts.net/)
-
-此地址已在 2026-09-22 13:00 +08:00 验证可返回项目登录页。需要项目普通成员账号，账号密码由项目所有者单独提供；不要使用或公开管理员账号。在线状态取决于本机、Docker、项目及 Tailscale 网络连接。
+**在线演示：[Totoro Nexus](https://elective-cash-revival.ngrok-free.dev/)**（需向作者索取体验账号；首次访问可能出现 ngrok 的 Visit Site 提示）。演示运行在作者本机，电脑、Docker 和隧道在线时可访问。Console 需要管理员角色。
 <!-- public-demo-status:end -->
 
-## 启动
+## 能做什么
 
-需要 Docker Compose、JDK 17 或兼容 JDK、Maven；测试前端另需 Node.js，运行验收脚本另需 Python 3。模型通过阿里云百炼调用，实际可用模型与权限以自己的账号为准。
+| 能力 | 实现范围 |
+|---|---|
+| Agent 配置 | 模型选择、指令、知识范围、工具权限、调用预算与版本管理 |
+| 三种执行模式 | ReAct 自主工具调用、Plan–Execute–Replan 分阶段执行、Workflow 运维分析 |
+| RAG 与附件 | 向量 / BM25 / 混合检索、重排、分段读文、来源引用及多轮附件问答 |
+| 执行观测 | SSE 过程事件、模型与工具耗时、Token 用量、运行记录与回放 |
+| Console 与评测 | 账号权限、资料版本、Agent 调试、召回指标和逐题回答评测 |
+
+Workflow 使用模拟告警与日志提供诊断建议，不执行生产修复。SSE 推送执行过程，结构化答案完成校验后展示，不等于全文逐字输出。评测成绩对应各自记录的模型、配置、资料和时间，不能视为任意输入下的质量保证。
+
+## 架构
+
+```mermaid
+flowchart LR
+    UI[聊天前台 / Console] --> API[登录权限与会话 API]
+    API --> Agent[路由与 Agent 执行]
+    Agent --> Modes[ReAct / Plan / Workflow]
+    Modes --> Tools[检索 / 读文 / 附件 / MCP]
+    Tools --> RAG[Milvus + BM25 + 重排]
+    Modes --> LLM[阿里云百炼]
+    Agent --> DB[(PostgreSQL)]
+    Tools --> Files[原文与附件存储]
+    Agent --> Events[SSE 事件与调用观测]
+    Events --> UI
+```
+
+详细设计：[模块与代码导航](docs/architecture.md) · [执行模式与边界](docs/execution-modes.md)
+
+## 本地运行
+
+**首次安装（Windows PowerShell）**：准备 Docker Desktop、JDK 17 和 Maven，然后在项目根目录执行：
 
 ```powershell
 Copy-Item .env.example .env
-# 编辑 .env：填写自己的模型凭据和数据库密码，然后：
-./start.ps1
+# 编辑 .env，填写自己的百炼 API Key 和数据库密码。
+./scripts/start.ps1
 ```
 
-工作台 `http://localhost:9900/`，本机 Console `http://localhost:9900/console.html`。初始管理员为 `admin`，自动生成的密码存于 `uploads/.platform/admin-initial-password.txt`；请登录后修改。源码不包含演示站的账户、知识库、聊天记录或密钥。首次安装后在 Console 上传资料并配置 Agent。
+首次构建完成后打开 [聊天前台](http://localhost:9900/) 或 [Console](http://localhost:9900/console.html)。初始账号为 `admin`，生成的密码位于 `runtime/uploads/.platform/admin-initial-password.txt`，登录后修改。
 
-已有镜像启动：`./start.ps1 -SkipBuild`。当前电脑开启既有公网入口：`./start-demo.ps1`。新电脑的公网设备身份需要自行配置，见 [部署与恢复](docs/deployment.md)。
+**后续使用只需双击 `启动平台.cmd`**：启动本地项目、打开页面，并连接已配置的 ngrok 外链。未配置外链时仍可本地使用。[完整部署说明](docs/deployment.md) · [可选外链配置](docs/ngrok-demo.md)
 
-## 工程结构
+全新安装需要在 Console 导入 [示例资料](examples/knowledge/README.md)、配置知识库和 Agent。GitHub 源码不包含作者的账号、六个已配置 Agent、聊天历史或私人附件，也不会自动复制线上演示的数据。
+
+## 目录
 
 ```text
-src/main/java/       后端、运行控制、检索与证据校验
-src/main/resources/ 数据库迁移、前端和冻结的模拟场景
-src/test/           保护行为的 Java / JavaScript 测试
-scripts/            构建指纹与可重复验收
-deploy/public-demo/ 公网反向代理与 Tailscale 配置
-eval/               评测案例定义（不含真实运行结果）
-docs/               架构、部署、验收边界
+Totoro-Nexus/
+├─ src/              后端、前台、Console、数据库迁移与测试
+├─ scripts/          构建、启动与验收辅助
+├─ deploy/           网关和外链配置
+├─ eval/             示例评测案例
+├─ examples/         可导入资料及来源许可
+├─ docs/             架构、部署和验收记录
+├─ docker-compose.yml
+└─ 启动平台.cmd       日常统一启动入口
 ```
 
-`uploads/`、`volumes/` 和 PostgreSQL 卷是私有运行数据；`target/` 是构建输出。它们都不进入 Git。测试源码属于工程的一部分，临时截图、浏览器登录态和旧版本副本不属于发布源码。
+运行后生成的 `runtime/`、`target/`、私有 `.env` 和本机 `backups/` 均不进入仓库。账号、Agent 和对话保存在 PostgreSQL 数据卷；原文、附件及向量服务文件保存在 `runtime/`。备份与恢复须同时保留这两部分，见 [数据与恢复](docs/deployment.md#数据位置)。
 
-## 能力与限制
-
-- Agent 版本固定于会话，配置包括任务说明、执行模式、知识库范围、模型和预算。意图判断决定回答依据，不替用户切换模式。
-- RAG 支持向量、BM25、混合召回、精排、命中附近的原文窗口和分页读文；引用绑定实际保存的资料版本。
-- 最近有效对话用于追问；不是无限记忆，也没有自动总结所有更早对话。详见 [执行模式](docs/execution-modes.md)。
-- 前台通过 SSE 展示进度与耗时；知识回答完成结构化提交和校验后再显示全文。SSE 不等于所有答案逐字输出。
-- 工具耗时、模型总耗时、可观测的上游首包和用量分开记录。嵌套检索与并行 Worker 的耗时不能相加当作总耗时。
-- 引用校验检查来源/原文对应关系，不能证明每句推断都正确。模型仍可能答非所问、遗漏限定条件、拒答或超时。
-- 模型调用、评测和真实对话消耗外部 API 额度；本地有限验收不代表并发性能、企业 SLA 或任意问题零幻觉。
+Docker 的 `totoro-nexus-prod` 负责应用与存储，`totoro-nexus-demo` 负责外链网关，两组共用同一套业务程序和数据。
 
 ## 验证
 
 ```powershell
 mvn test
 node --test src/test/js/*.test.js scripts/workbench-contract.test.cjs
-python scripts/verify_runtime_replay.py --base http://localhost:9900
-python scripts/accept_conversation_context.py --base http://localhost:9900
 ```
 
-后两条会实际调用模型并写入调试记录。每次发布先运行 `scripts/write-build-info.ps1`；部署版本以 `/build-info.json` 的指纹为准。旧版本的评测成绩保留为历史，不冒充当前构建成绩。验收结果和未解决限制见 [收尾验收](docs/acceptance.md)。
+普通自动化测试使用本地桩与测试数据库；真实模型测试需要显式开启。`scripts/accept_*.py`、`scripts/verify_runtime_replay.py` 和 Console 评测会调用实际服务、可能产生费用，不在自动 CI 中运行。
 
-保留原项目的 Apache-2.0 许可证。第三方依赖、知识库内容和模型服务分别适用其自身授权；运行时上传的资料不随本仓库发布。
+[已完成验收与已知限制](docs/acceptance.md) · [历史 RAG 评测](docs/rag-v2-verification.md)
 
-当前目录为最终维护与演示环境，旧 `Project` 保留作默认停止的 UAT（9901）。干净源码包位于 `target/totoro-nexus-source.zip`，只包含 Git 跟踪文件，不包含运行数据或凭据。不要直接压缩整个运行目录上传 GitHub。
+## 许可
+
+项目代码采用 [Apache-2.0](LICENSE)。示例资料遵循各自来源许可，见 [来源说明](examples/knowledge/README.md)；项目许可不替代第三方资料与角色形象的权利归属。

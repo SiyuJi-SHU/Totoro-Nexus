@@ -1,0 +1,8 @@
+version: "3"
+agent:
+  web_addr: 127.0.0.1:9903
+  console_ui: false
+  remote_management: false
+  log: stdout
+  log_format: json
+  log_level: info

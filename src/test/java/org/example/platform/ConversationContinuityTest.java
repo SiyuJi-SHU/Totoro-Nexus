@@ -35,6 +35,47 @@ class ConversationContinuityTest {
             verify(f.models,never()).response(any(),anyString(),any());verifyNoInteractions(f.search);
         }
     }
+    @Test void transformSelectsLatestSuccessfulAnswerInsteadOfEarlierTopic()throws Exception {
+        try(var f=new GeneralKnowledgeRuntimeTest.Fixture(false,"plan_execute_replan","SOURCED")) {
+            var old=seed(f,"TrafficAbsent 告警的触发条件。",List.of());
+            var session=f.runs.session(old.sessionId(),"alice");
+            var context=f.catalog.decode(old.contextJson(),AgentRuntime.Context.class);
+            var latest=f.runs.create(session,new AgentRuntime.Input("oncall",session.id(),"概述附件",null,false),context);
+            f.runs.finish(latest.id(),"completed",new AgentRuntime.Result("completed","雅典娜劝忒勒马科斯寻找父亲。",new AgentAnswerService.Answer(List.of(),List.of(),List.of()),null,List.of(),List.of(),List.of(),0,1,"test","knowledge_answer","KNOWLEDGE_QUESTION","plan_execute_replan"),null);
+            var failed=f.runs.create(session,new AgentRuntime.Input("oncall",session.id(),"重试附件",null,false),context);
+            f.runs.finish(failed.id(),"failed",null,"format error");
+            when(f.models.call(any(),eq("task-routing"),anyString(),anyString())).thenReturn("{\"task\":\"FOLLOW_UP\",\"basis\":\"TRANSFORM\"}");
+            when(f.models.streamText(any(),eq("direct-response"),anyString(),anyString(),any())).thenAnswer(call->{
+                var data=f.json.readTree((String)call.getArgument(3));
+                assertThat(data.path("previousResponse").path("answer").asText()).contains("雅典娜").doesNotContain("TrafficAbsent");
+                assertThat(data.path("earlierConversation").toString()).contains("TrafficAbsent");
+                return "雅典娜提出建议。忒勒马科斯准备寻找父亲。";
+            });
+            follow(f,old,"把刚才的回答改写成两句话，不增加事实。");
+            verifyNoInteractions(f.search);
+        }
+    }
+    @Test void attachmentExclusionsAreScopedToTheCurrentRequest()throws Exception {
+        var old=new AgentRuntime.Context.AttachmentContent("old","old.md","h","旧资料");
+        var current=new AgentRuntime.Context.AttachmentContent("new","new.md","h","新资料");
+        assertThat(AgentRuntime.requestMaterials("说明 TrafficAbsent 条件，不使用刚才的文学附件。",List.of(old))).isEmpty();
+        assertThat(AgentRuntime.requestMaterials("不要读取 old.md，读取 new.md。",List.of(old,current))).containsExactly(current);
+        assertThat(AgentRuntime.requestMaterials("读一下刚才的附件",List.of(old))).containsExactly(old);
+        assertThat(AgentRuntime.requestMaterials("不要逐段翻译附件，只概述",List.of(old))).containsExactly(old);
+        try(var f=new GeneralKnowledgeRuntimeTest.Fixture(false,"react","SOURCED")) {
+            var seed=seed(f,"附件已上传。",List.of());
+            when(f.attachments.list(anyString(),eq("alice"))).thenReturn(List.of(new SessionAttachment("old",seed.sessionId(),"old.md","text/plain",3,null,java.time.Instant.now(),"alice")));
+            when(f.attachments.readContent("old","alice")).thenReturn("旧资料");
+            when(f.models.response(any(),eq("react-step"),any())).thenAnswer(call->{
+                Prompt prompt=call.getArgument(2);
+                assertThat(prompt.getInstructions().toString()).doesNotContain("本次材料目录","read_material结果");
+                return GeneralKnowledgeRuntimeTest.submit(f.draft("知识库回答"));
+            });
+            var result=follow(f,seed,"说明 TrafficAbsent 条件，不使用刚才的文学附件。");
+            assertThat(f.runs.events(result.id(),0)).noneMatch(e->e.type().equals("tool_start")&&e.data().toString().contains("materials.read"));
+            assertThat(f.catalog.decode(result.contextJson(),AgentRuntime.Context.class).attachments()).hasSize(1);
+        }
+    }
     @Test void followupEvidenceUsesSameSpanProtocolAndSurvivesFailedAttempts()throws Exception {
         try(var f=new GeneralKnowledgeRuntimeTest.Fixture(false,"react","SOURCED")) {
             String id="D-12345678901234567890",fact="Traffic loss alone does not prove a service outage.";
@@ -65,6 +106,28 @@ class ConversationContinuityTest {
             });
             when(f.models.response(any(),eq("answer-synthesis"),any())).thenReturn(GeneralKnowledgeRuntimeTest.submit(f.draft("上轮检查的是Gitaly p95 latency。")));
             follow(f,old,"刚才我们讨论的是哪个检查？");
+        }
+    }
+    @Test void attachmentFollowupReusesOnlyTheSameFileContent()throws Exception {
+        try(var f=new GeneralKnowledgeRuntimeTest.Fixture(false,"react","SOURCED")) {
+            String content="附件事实：项目代号为 MAPLE。",fileId="file-1",hash=org.example.service.KnowledgeFiles.digest(content);
+            var evidence=new AgentToolRegistry.Evidence("U-original",fileId,hash,"notes.md","附件",0,content.length(),content,"attachment");
+            var old=seed(f,"已经读完 notes.md，项目代号为 MAPLE。",List.of(evidence));
+            when(f.attachments.list(anyString(),eq("alice"))).thenReturn(List.of(new SessionAttachment(fileId,old.sessionId(),"notes.md","text/markdown",content.length(),null,java.time.Instant.now(),"alice")));
+            when(f.attachments.readContent(fileId,"alice")).thenReturn(content);
+            when(f.models.call(any(),eq("task-routing"),anyString(),anyString())).thenReturn("{\"task\":\"FOLLOW_UP\",\"basis\":\"SOURCED\"}");
+            when(f.models.response(any(),eq("react-step"),any())).thenReturn(GeneralKnowledgeRuntimeTest.submit(f.catalog.encode(
+                    Map.of("answerText","项目代号为 MAPLE。","citations",List.of(Map.of("id","U-original","spanIds",List.of("s0"))),"missingEvidence",List.of()))));
+            var reused=follow(f,old,"我发你的附件里项目代号是什么？");
+            assertThat(f.runs.events(reused.id(),0)).noneMatch(e->e.type().equals("tool_start"));
+            assertThat(f.catalog.decode(reused.resultJson(),AgentRuntime.Result.class).answer().citations()).singleElement().satisfies(c->assertThat(c.quote()).isEqualTo(content));
+            String updated="附件事实：项目代号更新为 CEDAR。";
+            when(f.attachments.readContent(fileId,"alice")).thenReturn(updated);
+            when(f.models.response(any(),eq("react-step"),any())).thenReturn(GeneralKnowledgeRuntimeTest.submit(f.draft("项目代号更新为 CEDAR。")));
+            var changed=follow(f,reused,"再读一下附件，项目代号是什么？");
+            assertThat(f.runs.events(changed.id(),0)).anyMatch(e->e.type().equals("tool_start"));
+            assertThat(f.catalog.decode(changed.resultJson(),AgentRuntime.Result.class).evidence())
+                    .noneMatch(e->e.id().equals("U-original")).anySatisfy(e->assertThat(e.content()).contains("CEDAR"));
         }
     }
 }

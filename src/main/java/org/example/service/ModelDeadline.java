@@ -24,5 +24,8 @@ public final class ModelDeadline {
         catch(InterruptedException e){future.cancel(true);Thread.currentThread().interrupt();throw new CancellationException();}
         catch(ExecutionException e){if(e.getCause() instanceof RuntimeException r)throw r;throw new IllegalStateException(e.getCause());}
     }
-    public static final class LimitException extends RuntimeException {public LimitException(){super("模型调用达到时间上限");}}
+    public static final class LimitException extends RuntimeException {
+        public LimitException(){this("模型调用达到时间上限");}
+        public LimitException(String message){super(message);}
+    }
 }

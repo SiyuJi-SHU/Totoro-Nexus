@@ -53,4 +53,15 @@ class TaskRouterTest {
         var result=router.decide("你好",false,false,config,List.of());
         assertThat(result.task()).isEqualTo(TaskRouter.Task.GREETING);assertThat(result.basis()).isEqualTo(TaskRouter.Basis.NONE);
     }
+    @Test void routingSeesAttachmentIdentityWithoutReceivingItsBody(){
+        when(models.call(any(),eq("task-routing"),anyString(),anyString())).thenAnswer(call->{
+            var data=new ObjectMapper().readTree((String)call.getArgument(3));
+            assertThat(data.path("materials").get(0).path("filename").asText()).isEqualTo("chapter.md");
+            assertThat(data.path("materials").get(0).path("id").asText()).isEqualTo("file-1");
+            assertThat(data.toString()).doesNotContain("PRIVATE_BODY");
+            return "{\"task\":\"KNOWLEDGE_QUESTION\",\"basis\":\"SOURCED\"}";
+        });
+        router.decide("读一下发你的东西",false,false,config,List.of(),List.of(
+                new AgentRuntime.Context.AttachmentContent("file-1","chapter.md","hash","PRIVATE_BODY")));
+    }
 }

@@ -58,6 +58,8 @@ class ExecutionModesTest {
             return Map.of("status","ok");
         });
         try(var workflow=new OnCallWorkflowExecutor()){assertThat(workflow.run(e)).isEqualTo(draft);}
+        verify(models).call(any(),eq("workflow-supervisor"),contains("控制台操作、工单筛选"),anyString());
+        verify(models,times(3)).call(any(),eq("workflow-worker"),contains("知识库名称、资料来源和手册示例不能证明"),anyString());
         assertThat(contexts).hasSize(3);assertThat(observed).hasValue(6);assertThat(e.calls).hasValue(6);assertThat(e.context.evidence).hasSize(3);assertThat(e.context.cache).isEmpty();
         verify(models,never()).response(any(),eq("react-step"),any());verify(models,never()).call(any(),eq("plan-create"),anyString(),anyString());
         verify(models,times(3)).call(any(),eq("workflow-worker"),anyString(),anyString());
@@ -117,6 +119,17 @@ class ExecutionModesTest {
         assertThat(e.complete).isFalse();assertThat(e.calls).hasValue(1);assertThat(e.notices).contains("重复请求未带来新进展，已停止调查");
         verify(models,never()).response(any(),eq("answer-synthesis"),any());
     }
+    @Test void attachmentPlainTextUsesExistingFinalSynthesisAndStillRejectsInvalidAnswers(){
+        var e=execution("react",false,(t,a,c)->Map.of());
+        e.context.materials=List.of(new AgentRuntime.Context.AttachmentContent("file","file.md","h","附件内容"));
+        when(models.response(any(),eq("react-step"),any())).thenReturn(new ChatResponse(List.of(new Generation(new AssistantMessage("普通回答")))));
+        when(models.response(any(),eq("answer-synthesis"),any())).thenReturn(new ChatResponse(List.of(new Generation(new AssistantMessage(draft)))));
+        assertThat(new ReActExecutor().run(e)).isEqualTo(draft);
+        verify(models,times(1)).response(any(),eq("answer-synthesis"),any());
+        assertThat(e.calls).hasValue(0);
+        when(models.response(any(),eq("answer-synthesis"),any())).thenReturn(new ChatResponse(List.of(new Generation(new AssistantMessage("不符合答案协议")))));
+        assertThatThrownBy(()->AnswerFormatException.require(new ReActExecutor().run(e),json,"test",e.context.answerPolicy)).isInstanceOf(AnswerFormatException.class);
+    }
     @Test void reactToolBudgetStopIsPartial(){
         var e=execution("react",false,1,(t,a,c)->Map.of("status","ok"));
         when(models.response(any(),eq("react-step"),any())).thenReturn(response("search_knowledge","{\"query\":\"query\"}"));
@@ -147,11 +160,24 @@ class ExecutionModesTest {
         assertThat(options.getParallelToolCalls()).isFalse();
         assertThat(options.getToolChoice()).isEqualTo(Map.of("type","function","function",Map.of("name","submit_answer")));
     }
+    @Test void sourcedOperationsNeverImplyVerifiedIncidentApplicability(){
+        var action=new GroundedAnalysis.Action("检查 HAProxy 后端", "sudo hatop -s /run/haproxy/admin.sock", "",List.of(new GroundedAnalysis.Citation("D1","source command")));
+        var answer=new AgentAnswerService.Answer(List.of(),List.of(action),List.of());
+        var e=execution("workflow",true,(t,a,c)->Map.of());
+        var service=new AgentAnswerService(json,new DiagnosticReportService());
+        for(String output:List.of(service.renderReport(answer,e.context.incident),service.render(answer,e.context.incident))){
+            assertThat(output).contains("尚未验证适用于当前现场","未确认前，不执行专属命令或配置操作");
+            assertThat(output.indexOf("尚未验证适用于当前现场")).isLessThan(output.indexOf("sudo hatop"));
+        }
+    }
     @Test void fixedReportPreservesContradictionsAndRealSourceLabel(){
         var evidence=new GroundedAnalysis.Finding("恢复请求成功，但早前请求失败","observation",List.of(new GroundedAnalysis.Citation("L1","actual error")));
-        var answer=new AgentAnswerService.Answer(List.of(),List.of(),List.of("需要后续日志"),List.of(evidence));
+        var answer=new AgentAnswerService.Answer(List.of(evidence),List.of(),List.of("需要后续日志"),List.of(evidence));
         var e=execution("workflow",true,(t,a,c)->Map.of());
         String text=new AgentAnswerService(json,new DiagnosticReportService()).renderReport(answer,e.context.incident);
-        assertThat(text).contains("现场概况","当前判断","反证与限制","建议操作","待确认项","用户提交材料").doesNotContain("模拟现场");
+        assertThat(text).contains("现场概况","当前判断","反证与限制","建议操作","待确认项","用户提交材料","尚未确认根因").doesNotContain("模拟现场");
+        assertThat(new AgentAnswerService(json,new DiagnosticReportService()).render(answer,e.context.incident))
+                .startsWith("本轮尚未确认根因").contains("没有足够证据排除其他可能原因");
+        assertThat(new AgentAnswerService(json,new DiagnosticReportService()).render(answer,null)).doesNotContain("本轮尚未确认根因");
     }
 }

@@ -78,6 +78,20 @@ class PlannedExecutionTest {
         when(models.call(any(),eq("plan-execute"),anyString(),anyString())).thenReturn("{\"action\":\"execute\",\"tool\":\"shell\",\"arguments\":{}}");
         assertThat(run((t,a)->{throw new AssertionError();}).reason()).isEqualTo("invalid_plan");
     }
+    @Test void unsupportedParameterIsCorrectedBeforeCallingTheTool(){
+        var strictSearch=new AgentToolRegistry.Tool("documents.search","search_document_text","检索","",
+                Map.of("type","object","properties",Map.of("query",Map.of("type","string")),"required",List.of("query"),"additionalProperties",false),"内置",true);
+        when(models.call(any(),eq("plan-create"),anyString(),anyString())).thenReturn(plan("plan",step("a","读取相关资料","[]")));
+        when(models.call(any(),eq("plan-execute"),anyString(),anyString())).thenReturn(
+                "{\"action\":\"execute\",\"tool\":\"search_document_text\",\"arguments\":{\"query\":\"TrafficAbsent\",\"version\":\"v1\"}}",command("TrafficAbsent"));
+        when(models.call(any(),eq("plan-observe"),anyString(),anyString())).thenReturn("{\"action\":\"finish\",\"stepComplete\":true}");
+        var calls=new AtomicInteger();
+        var result=new PlannedExecution(models,json).run("问题",config,List.of(strictSearch),Map.of(),(tool,args)->{
+            calls.incrementAndGet();assertThat(args.has("version")).isFalse();return Map.of("content","source");
+        },()->false,p->{},(t,d)->{},()->{});
+        assertThat(calls.get()).isEqualTo(1);assertThat(result.reason()).isEqualTo("task_satisfied");
+        verify(models,times(2)).call(any(),eq("plan-execute"),anyString(),anyString());
+    }
     @Test void exhaustedBudgetPreventsAnotherObservationOrTool() {
         when(models.call(any(),eq("plan-create"),anyString(),anyString())).thenReturn(plan("plan",step("a","A","[]")));
         when(models.call(any(),eq("plan-execute"),anyString(),anyString())).thenReturn(command("A"));

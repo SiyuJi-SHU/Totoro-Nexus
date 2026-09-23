@@ -1,7 +1,9 @@
+runtime/
 target/
 output/
 .playwright-cli/
 .idea/
+*.iml
 .vscode/
 __pycache__/
 *.pyc

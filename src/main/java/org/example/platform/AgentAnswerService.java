@@ -52,6 +52,7 @@ public class AgentAnswerService {
     }
     public record Validated(Answer answer,int rejectedItems,List<String> notices) {}
     private final ObjectMapper json;private final DiagnosticReportService diagnosis;
+    private static final String DIAGNOSTIC_LIMITATION="本轮尚未确认根因，也没有足够证据排除其他可能原因。\n\n";
     public AgentAnswerService(ObjectMapper json,DiagnosticReportService diagnosis){this.json=json;this.diagnosis=diagnosis;}
     /** Accept a shape-checked draft after span expansion; check optional source links, not every sentence. */
     public Validated acceptConversation(String raw,Map<String,AgentToolRegistry.Evidence> evidence) throws Exception {
@@ -152,8 +153,10 @@ public class AgentAnswerService {
     private static String boundedMissing(String text){return text
             .replaceFirst("^(?:绑定的)?知识库(?:中)?(?:没有包含|没有|不存在|未包含|缺少|缺乏)","本次检索未找到")
             .replaceFirst("^所有检索均未返回","本次检索未返回");}
+    private static final String ACTION_APPLICABILITY="以下是资料支持的候选检查，尚未验证适用于当前现场。先确认对应平台、组件和部署方式；未确认前，不执行专属命令或配置操作。\n\n";
     public String render(Answer answer,IncidentSnapshot incident) {
         StringBuilder out=new StringBuilder();
+        if(incident!=null&&answer.findings().stream().noneMatch(f->"confirmed".equals(f.certainty())))out.append(DIAGNOSTIC_LIMITATION);
         if(!answer.answerText().isBlank()) {
             out.append(answer.answerText());
             var additional=answer.citations().stream().filter(ref->!answer.answerText().contains("["+ref.id()+"]")).toList();
@@ -162,7 +165,7 @@ public class AgentAnswerService {
         }
         if(!answer.hasContent()&&answer.missingEvidence().isEmpty())out.append("目前证据不足，尚不能给出有依据的结论。\n\n");
         for(var finding:answer.findings())out.append(finding.certainty().equals("hypothesis")?"待验证：":"").append(finding.text()).append(refs(finding.citations())).append("\n\n");
-        if(!answer.actions().isEmpty())out.append("建议检查：\n\n");
+        if(!answer.actions().isEmpty()){out.append("建议检查：\n\n");if(incident!=null)out.append(ACTION_APPLICABILITY);}
         int step=0;for(var action:answer.actions()) {
             out.append(++step).append(". ").append(action.text()).append(refs(action.citations())).append("\n");
             if(!Objects.toString(action.prerequisites(),"").isBlank())out.append("   前提与风险：").append(action.prerequisites()).append("\n");
@@ -175,7 +178,7 @@ public class AgentAnswerService {
         }
         if(!answer.missingEvidence().isEmpty()){
             boolean answered=answer.hasContent();
-            out.append(answered?"补充说明：\n\n":"本次未能确认：\n\n");answer.missingEvidence().forEach(m->out.append("- ").append(m).append('\n'));
+            out.append(answered?"待确认与限制：\n\n":"本次未能确认：\n\n");answer.missingEvidence().forEach(m->out.append("- ").append(m).append('\n'));
         }
         return out.toString();
     }
@@ -183,12 +186,13 @@ public class AgentAnswerService {
         StringBuilder out=new StringBuilder("现场概况\n\n");
         out.append(incident.scenarioName()).append(" · ").append(incident.service()).append("\n来源：")
             .append("user-materials".equals(incident.scenarioId())?"用户提交材料":"模拟现场").append("\n\n当前判断\n\n");
-        if(answer.findings().isEmpty())out.append("目前证据不足，不能确认原因。\n\n");
+        if(answer.findings().stream().noneMatch(f->"confirmed".equals(f.certainty())))out.append(DIAGNOSTIC_LIMITATION);
         for(var f:answer.findings())out.append("hypothesis".equals(f.certainty())?"待验证原因：":"observation".equals(f.certainty())?"直接观察：":"资料支持：").append(f.text()).append(refs(f.citations())).append("\n\n");
         if(!answer.contradictions().isEmpty()){
             out.append("反证与限制\n\n");for(var f:answer.contradictions())out.append(f.text()).append(refs(f.citations())).append("\n\n");
         }
         out.append("建议操作\n\n");
+        if(!answer.actions().isEmpty())out.append(ACTION_APPLICABILITY);
         if(answer.actions().isEmpty())out.append("暂无通过来源核对的操作建议。\n\n");
         for(var a:answer.actions()){
             out.append(a.text()).append(refs(a.citations())).append("\n");

@@ -1,4 +1,4 @@
-# start.ps1 compiles the current local source tree before this runtime image is built.
+# scripts/start.ps1 compiles the current local source tree before this runtime image is built.
 # The runtime image never receives source files, CSV credentials, or local data.
 FROM eclipse-temurin:17-jre-jammy
 WORKDIR /app

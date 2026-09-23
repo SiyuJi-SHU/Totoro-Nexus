@@ -8,7 +8,7 @@ server:
 
 file:
   upload:
-    path: ./uploads
+    path: ${FILE_UPLOAD_PATH:./runtime/uploads}
     allowed-extensions: txt,md
 
 milvus:
@@ -52,7 +52,7 @@ spring:
           initial-interval: 2000  # 初始重试间隔2秒
           multiplier: 2  # 重试间隔倍数
           max-interval: 10000  # 最大重试间隔10秒
-    
+
     # Spring AI MCP 客户端配置
     # 如果使用mock数据，请注释这部分内容
     mcp:
@@ -118,7 +118,7 @@ cls:
 # AIOps 告警场景配置
 console:
   eval:
-    path: ${CONSOLE_EVAL_PATH:../eval}
+    path: ${CONSOLE_EVAL_PATH:./eval}
 
 aiops:
   smart:
